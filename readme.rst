@@ -6,8 +6,11 @@ FABRIS PROGRAMMING LANGUAGE
 Introduction
 ========
 
-Fabris is a stack-based, concatenative language inspired by Forth.
+Fabris is a `stack-oriented`_, `concatenative`_ language inspired by Forth.
 It is designed to be compact, fast and beginner friendly.
+
+.. _stack-oriented: https://en.wikipedia.org/wiki/Stack-oriented_programming_language
+.. _concatenative: https://en.wikipedia.org/wiki/Concatenative_programming_language
 
 Current Fabris version is unstable and is intended only for experimental use.
 
@@ -40,7 +43,7 @@ Conditional statement::
 	
 Conditional statement with alternative::
 
-	if 10 ge then "ten or more" else "less than ten" end
+	if 10 ge then "ten or more" else "nine or less" end
 
 Counted loop::
 
@@ -56,20 +59,25 @@ Universal loop::
 		emit
 	loop
 
-New word definition::
+New function definition::
 
 	def square dup mul end
 
-New word definition with named parameters::
+New function definition with named parameters::
 
 	def energy of h m v as
 		m v v mul mul 2 div -- kinetic energy
 		h m g mul mul -- potential energy
 		add end
 
+Testing::
 
-Instructions
-============
+	test 40 2 add 42 eq ok
+	test 10 dup inc 11 eq ok 10 eq ok
+
+
+Functions
+=========
 
 
 Stack Manipulation
