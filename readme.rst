@@ -6,18 +6,13 @@ FABRIS PROGRAMMING LANGUAGE
 Introduction
 ========
 
-Fabris is a concatenative, stack based language inspired by Forth.
-It is designed to be small, fast and beginner friendly.
+Fabris is a stack-based, concatenative language inspired by Forth.
+It is designed to be compact, fast and beginner friendly.
 
 Current Fabris version is unstable and is intended only for experimental use.
 
 The name comes from first leters of main components of Fabris VM:
-  - F - float stack
-  - A - allocator
-  - B - base pointers
-  - R - return stack
-  - I - instruction pointer
-  - S - stack
+(F)loat stack, (A)llocator, (B)ase pointers, (R)eturn stack, (I)nstruction pointer, (S)tack.
 
 Similarity with the name of Italian fencing master Salvator Fabris
 is not a coincidence.
@@ -26,14 +21,51 @@ is not a coincidence.
 Basic Syntax
 ============
 
-Comments
---------
+Basic expressions::
 
-Stream Comments
-~~~~~~~~~~~~~~~
+	"the answer is " print 40 2 add dot
 
-Line Comments
-~~~~~~~~~~~~~
+Line comment::
+
+	"hello world" print -- the rest of line is ignored
+	-- this line is also ignored
+	
+Stream comment::
+
+	4 10 mul (this is a comment) 1 1 add add ( this also )
+
+Conditional statement::
+
+	if 10 eq then "equals ten" print end
+	
+Conditional statement with alternative::
+
+	if 10 ge then "ten or more" else "less than ten" end
+
+Counted loop::
+
+	3 times
+		"Hastur! " print
+	loop
+
+Universal loop::
+
+	do
+		dup getc
+		if zero then drop drop break end
+		emit
+	loop
+
+New word definition::
+
+	def square dup mul end
+
+New word definition with named parameters::
+
+	def energy of h m v as
+		m v v mul mul 2 div -- kinetic energy
+		h m g mul mul -- potential energy
+		add end
 
 
 Instructions
@@ -147,44 +179,4 @@ More Arithmetic
   muldivmod (abc--xr) ... (a*b/c, a*b%c)
   divmod    (ab--xr)  ... (a/b, a%b)
   ========= ========= ============================================================
-
-
-
-Control Flow
-============
-
-
-Conditional execution
----------------------
-
-if ... then ... end
-if ... then ... else ... end
-
-
-Counted loop
-------------
-
-... times ... loop
-... times ... break ... loop
-
-
-Universal loop
---------------
-
-do ... loop
-do ... break ... loop
-
-
-Variables
----------
-
-var X
-into X
-
-
-Words
------
-
-def X ... ret
-ref X
 
