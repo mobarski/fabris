@@ -72,8 +72,8 @@ New function definition with named parameters::
 
 Testing::
 
-    test 40 2 add 42 eq ok
-    test 10 dup inc 11 eq ok 10 eq ok
+    test 40 2 add 42 ok
+    test 10 dup inc 11 ok 10 ok
 
 Lambda expressions::
     
@@ -106,7 +106,7 @@ Stack Manipulation
   depth    (--n)      push number of items on stack
   tor      (a--)      take the top item of and push it onto the return stack
   fromr    (--x)      take the top item of return stack and push it on top
-  reverse  (*n--*)    reverse order of n top stack items
+  reverse  (?n--?)    reverse order of n top stack items
   ======== ========== ========================================================
 
 
