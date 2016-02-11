@@ -6,8 +6,8 @@ FABRIS PROGRAMMING LANGUAGE
 Introduction
 ========
 
-Fabris is a `stack-oriented`_, `concatenative`_ language inspired by Forth.
-It is designed to be compact, fast and beginner friendly.
+Fabris is a `stack-oriented`_, `concatenative`_ language designed to be compact,
+fast and beginner friendly.
 
 .. _stack-oriented: https://en.wikipedia.org/wiki/Stack-oriented_programming_language
 .. _concatenative: https://en.wikipedia.org/wiki/Concatenative_programming_language
@@ -26,54 +26,63 @@ Basic Syntax
 
 Basic expressions::
 
-	"the answer is " print 40 2 add dot
+    "the answer is " print 40 2 add dot
 
 Line comment::
 
-	"hello world" print -- the rest of line is ignored
-	-- this line is also ignored
+    "hello world" print -- the rest of line is ignored
+    -- this line is also ignored
 	
 Stream comment::
 
-	4 10 mul (this is a comment) 1 1 add add ( this also )
+    4 10 mul (this is a comment) 1 1 add add ( this also )
 
 Conditional statement::
 
-	if 10 eq then "equals ten" print end
+    if 10 eq then "equals ten" print end
 	
 Conditional statement with alternative::
 
-	if 10 ge then "ten or more" else "nine or less" end
+    if 10 ge then "ten or more" else "nine or less" end
 
 Counted loop::
 
-	3 times
-		"Hastur! " print
-	loop
+    3 times
+        "Hastur! " print
+    loop
 
 Universal loop::
 
-	do
-		dup getc
-		if zero then drop drop break end
-		emit
-	loop
+    do
+        dup getc
+        if zero then drop drop break end
+        emit
+    loop
 
 New function definition::
 
-	def square dup mul end
+    def square dup mul end
 
 New function definition with named parameters::
 
-	def energy of h m v as
-		m v v mul mul 2 div -- kinetic energy
-		h m g mul mul -- potential energy
-		add end
+    def energy of h m v as
+        m v v mul mul 2 div -- kinetic energy
+        h m g mul mul -- potential energy
+        add end
 
 Testing::
 
-	test 40 2 add 42 eq ok
-	test 10 dup inc 11 eq ok 10 eq ok
+    test 40 2 add 42 eq ok
+    test 10 dup inc 11 eq ok 10 eq ok
+
+Lambda expressions::
+    
+    [" world" print] [ "hello" print ] call call -- prints "hello world"
+
+Recurrency::
+
+    def print-stack
+        if depth then dot print-stack end end
 
 
 Functions
@@ -97,6 +106,7 @@ Stack Manipulation
   depth    (--n)      push number of items on stack
   tor      (a--)      take the top item of and push it onto the return stack
   fromr    (--x)      take the top item of return stack and push it on top
+  reverse  (*n--*)    reverse order of n top stack items
   ======== ========== ========================================================
 
 
@@ -156,9 +166,9 @@ Logic
 Other
 -----
 
-  ======= ======== ===============================================================
+  ======= ======== ======================================================================
   name    effect   comments
-  ======= ======== ===============================================================
+  ======= ======== ======================================================================
   nop     (--)     do nothig
   clock   (--x)    returns number of microseconds since the program was launched
   halt    (--)     stops program execution
@@ -170,7 +180,10 @@ Other
   xdot    (a--a)   prints top item as hexadecimal number followed by a space
   argc    (--x)    returns number of program arguments
   argv    (a--xn)  returns address and length of argument number a
-  ======= ======== ===============================================================
+  hash    (an--x)  return hash value for given string (x65599 algorithm)
+  call    (f--)    call function referenced by f
+  ok      (ab--)   do nothing if two top items are equal, halt and print error otherwise 
+  ======= ======== ======================================================================
 
 
 More Arithmetic

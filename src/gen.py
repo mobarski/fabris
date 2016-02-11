@@ -21,11 +21,7 @@ clock swap sub dot
 """
 
 source = """
-0
-argc times
-	dup argv print '\n' emit
-	inc
-loop
+test 1 2 3 3 ok 2 ok 1 ok 
 """
 
 ##############################################
@@ -34,18 +30,22 @@ import re
 import os
 from pprint import pprint
 
+try:
+	os.mkdir('gen')
+except: pass
+
 raw = open('vm.c','r').read()
-f1 = open('dispatch.h','w')
-f2 = open('functions.h','w')
-f3 = open('code.h','w')
-f4 = open('dispatch_call.h','w')
-f5 = open('run_switch.h','w')
-f6 = open('repl_switch.h','w')
-f7 = open('run_repl_switch.h','w')
-f8 = open('dispatch_comp.h','w')
-f9 = open('compiled_call.h','w')
-f10 = open('compiled_inline.h','w')
-f11 = open('code_direct.h','w')
+f1 = open('gen/dispatch.h','w')
+f2 = open('gen/functions.h','w')
+f3 = open('gen/code.h','w')
+f4 = open('gen/dispatch_call.h','w')
+f5 = open('gen/run_switch.h','w')
+f6 = open('gen/repl_switch.h','w')
+f7 = open('gen/run_repl_switch.h','w')
+f8 = open('gen/dispatch_comp.h','w')
+f9 = open('gen/compiled_call.h','w')
+f10 = open('gen/compiled_inline.h','w')
+f11 = open('gen/code_direct.h','w')
 
 ops = re.findall("(?xms) op_([a-z]+): (.*?) (NEXT|JUMP);",raw)
 
@@ -86,9 +86,11 @@ for i,(op,body,kind) in enumerate(ops):
 ############################################
 
 regexp = """(?x)
-	[(] [^)]* [)]
+	-- [^\n]* \n
+|	[(] [^)]* [)]
 |	" [^"]* "
 |	' [^']* '
+|	\[ | \]
 |	[a-z0-9+-]+
 """
 tokens = re.findall(regexp,source)
@@ -130,6 +132,8 @@ for t in tokens:
 		continue
 	
 	if t[0]=='(':
+		continue
+	elif t.startswith('--'):
 		continue
 	elif t[0]=='"' and t[-1]=='"':
 		pass # TODO string
@@ -198,18 +202,30 @@ for t in tokens:
 		if len(ctrl)>1:
 			code += [opcode['ret']]
 			continue
-		if code[-2]==opcode['call']:
-			code[-2] = opcode['tailcall']
+		if code[-2]==opcode['callx']:
+			code[-2] = opcode['tailcallx']
 		else:
 			code += [opcode['ret']]
 		here = len(code)
 		kind,there = ctrl.pop(-1)
 		code[there] = here-there + 1
+	elif t=='[':
+		code += [opcode['lambda']]
+		ctrl += [('lambda',len(code))]
+		code += [0]
+	elif t==']':
+		code += [opcode['ret']]
+		here = len(code)
+		kind,there = ctrl.pop(-1)
+		code[there] = here-there + 1
+	elif t in ['test','if']:
+		continue
+	###
 	elif t in var:
 		code += [opcode['pushv']]
 		code += [var[t]]
 	elif t in word:
-		code += [opcode['call']]
+		code += [opcode['callx']]
 		code += [word[t]]
 	else:
 		code += [opcode[t]]

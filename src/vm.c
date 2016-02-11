@@ -46,7 +46,7 @@ char **argval;
 
 void run_goto() {
 	void* dispatch[] = {
-		#include "dispatch.h"
+		#include "gen/dispatch.h"
 	};
 	
 	JUMP;
@@ -99,10 +99,10 @@ void run_goto() {
 			printf("%d ",sp[i]);
 		printf("\n");
 		NEXT;
-	op_assert:
-		if (sp[0]==sp[-1]) { sp-=1; // (x y -- x)
+	op_ok:
+		if (sp[0]==sp[-1]) { sp-=2; // (xy--)
 		} else {
-			printf("ERROR: assertion failed at ip=%d, expected %d got %d\n",ip-ibase,sp[0],sp[-1]);
+			printf("ERROR: test not ok at ip=%d, expected %d got %d\n",ip-ibase,sp[0],sp[-1]);
 			exit(0);
 		}
 		NEXT;
@@ -119,6 +119,15 @@ void run_goto() {
 			sp[0] = 0;
 		}
 		sp += 1;
+		NEXT;
+	op_hash:
+		utmp = 0;
+		for (i=0; i<sp[0]; i++) {
+			utmp *= 65599;
+			utmp += (uchar)((uchar*)(sp[-1]))[i];
+		}
+		sp[-1] = utmp;
+		sp -= 1;
 		NEXT;
 	// === BASIC ARITHMETIC ============
 	op_add:
@@ -284,7 +293,14 @@ void run_goto() {
 		sp += 1;
 		rp += 1;
 		NEXT;
-	
+	op_reverse:
+		for (i=0;i<sp[0]>>1;i++) {
+			tmp = sp[-i-1];
+			sp[-i-1] = sp[-sp[0]+i];
+			sp[-sp[0]+i] = tmp;
+		}
+		sp -= 1;
+		NEXT;
 	// === PUSH ==================
 	op_pushc:
 		sp[1] = (char)ip[1];
@@ -320,7 +336,7 @@ void run_goto() {
 	op_back:
 		ip -= (token)ip[1];
 		JUMP;
-	op_exe:
+	op_call:
 		rp[-1] = ip+1;
 		ip = (token*)sp[0];
 		rp -= 1;
@@ -329,13 +345,13 @@ void run_goto() {
 	op_ret:
 		ip=rp[0]; rp+=1;
 		JUMP;
-	op_call:
+	op_callx:
 		UTMP_LOAD_4();
 		rp[-1] = ip+2; // TODO vs token size
 		rp -= 1;
 		ip = ibase+utmp;
 		JUMP;
-	op_tailcall:
+	op_tailcallx:
 		UTMP_LOAD_4();
 		ip = ibase+utmp;
 		JUMP;
@@ -381,6 +397,11 @@ void run_goto() {
 		} else {ip+=2;}
 		sp -= 1;
 		JUMP;
+	op_lambda:
+		sp[1] = (uint)&ip[2];
+		sp += 1;
+		ip += ip[1];
+		JUMP;
 	// === NEW ============================
 	op_var:
 		ip[1] = sp[0];
@@ -421,7 +442,7 @@ void init(int *stack, int cells, token *code) {
 
 void runcode() {
 	token code[] = {
-		#include "code.h"
+		#include "gen/code.h"
 	};
 	int mem[1024];
 	init(&mem[0],1024,code);
