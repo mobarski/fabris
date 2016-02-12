@@ -7,7 +7,7 @@ Introduction
 ========
 
 Fabris is a `stack-oriented`_, `concatenative`_ language designed to be compact,
-fast and beginner friendly.
+fast_ and beginner friendly.
 
 .. _stack-oriented: https://en.wikipedia.org/wiki/Stack-oriented_programming_language
 .. _concatenative: https://en.wikipedia.org/wiki/Concatenative_programming_language
@@ -201,3 +201,22 @@ More Arithmetic
   divmod    (ab--xr)  ... (a/b, a%b)
   ========= ========= ============================================================
 
+
+Performance
+===========
+.. _fast:
+
+Programs are based on Benchmarks Test from http://dada.perl.it/shootout/.
+
+Times are given in milliseconds for best of 5 runs:
+
+  ============ == ==== ====== ==== ====== ======= ====== ===== ====== ======================== =================
+  benchmark     N goto switch call direct repl.sw c.call c.inl python machine                  fabris registers
+  ============ == ==== ====== ==== ====== ======= ====== ===== ====== ======================== =================
+  nested-loops  8    8     15   17      6      11      9    7     302 Atom N570 1.66 @ 1.0 GHz r=IP,SP
+  nested-loops  8    9     16   18      8      10     10    9     302 Atom N570 1.66 @ 1.0 GHz .
+  nested-loops 16  508    862  990    391     518    489  464   15313 Atom N570 1.66 @ 1.0 GHz .
+  nested-loops 16  398    882  934    287     546    400  369   15313 Atom N570 1.66 @ 1.0 GHz r=IP,SP
+  ============ == ==== ====== ==== ====== ======= ====== ===== ====== ======================== =================
+
+More benchmarks and results coming soon.
