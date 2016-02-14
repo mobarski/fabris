@@ -203,6 +203,7 @@ More Arithmetic
   divmod    (ab--xr)  ... (a/b, a%b)
   ========= ========= ============================================================
 
+
 String Manipulation
 -------------------
 
@@ -215,16 +216,26 @@ String Manipulation
   lstrip    (an--bx)     return string without leading whitespaces
   rstrip    (an--bx)     return string without trailing whitespaces
   substr    (ankc--anbc) return substring of c characters starting at b
-  begins    (anbm--anx)  return true if an string begins with bm string
-  ends      (anbm--anx)  return true if an string ends with bm string
-  contains  (anbm--anx)    return true if an string contains bm string
   index     (anbm--anx)  return index of bm string within an string, or -1
-  arein     (anbm--anx)    return true if an string contains any character from bm string
-  haschar   (anc--anx)     return true if an string contains character c
   char      (ani--anx)   return character at index i in given string
   upper     (an--an)       destructive change to lowercase
   lower     (an--an)       destructive change to uppercase
   ========= ============ ===================================================================
+
+
+String Comparators
+------------------
+
+  ========= ============ ===================================================================
+  name      effect       comments
+  ========= ============ ===================================================================
+  begins    (anbm--anx)  return true if an string begins with bm string
+  ends      (anbm--anx)  return true if an string ends with bm string
+  contains  (anbm--anx)    return true if an string contains bm string
+  arein     (anbm--anx)    return true if an string contains any character from bm string
+  haschar   (anc--anx)     return true if an string contains character c
+  ========= ============ ===================================================================
+
 
 Performance
 ===========
