@@ -15,7 +15,7 @@ fast_ and beginner friendly.
 Current Fabris version is unstable and is intended only for experimental use.
 
 The name comes from first leters of main components of Fabris VM:
-(F)loat stack, (A)llocator, (B)ase pointers, (R)eturn stack, (I)nstruction pointer, (S)tack.
+(F)ile descriptors, (A)llocators, (B)ase stack, (R)eturn stack, (I)nstruction pointer, (S)tack.
 
 Similarity with the name of Italian fencing master Salvator Fabris
 is not a coincidence.
@@ -97,8 +97,11 @@ Stack Manipulation
   ======== ========== ========================================================
   swap     (ab--ba)   swap the two top stack items
   dup      (a--aa)    duplicate the top stack item
+  dup2     (ab-abab)  duplicate two top stack items
   over     (ab--aba)  push the second item on top
   drop     (a--)      discard the top item
+  drop2    (ab--)     discard two top items
+  drop4    (abcd--)   discard four top items
   nip      (ab--b)    discard the second item
   tuck     (ab--bab)  insert copy of top item before second item
   rot      (abc--bca) rotate the third item to the top
@@ -180,7 +183,6 @@ Other
   xdot    (a--a)   prints top item as hexadecimal number followed by a space
   argc    (--x)    returns number of program arguments
   argv    (a--xn)  returns address and length of argument number a
-  hash    (an--x)  return hash value for given string (x65599 algorithm)
   call    (f--)    call function referenced by f
   ok      (ab--)   do nothing if two top items are equal, halt and print error otherwise 
   ======= ======== ======================================================================
@@ -201,24 +203,60 @@ More Arithmetic
   divmod    (ab--xr)  ... (a/b, a%b)
   ========= ========= ============================================================
 
+String Manipulation
+-------------------
+
+  ========= ===========  ===============================================================
+  name      effect       comments
+  ========= ===========  ===============================================================
+  hash      (an--x)      return hash value for given string (x65599 algorithm)
+  split     (an--rxfy)   return first word from a string and the rest of the string
+  strip     (an--bx)     return string without leading and trailing whitespaces
+  lstrip    (an--bx)     return string without leading whitespaces
+  rstrip    (an--bx)     return string without trailing whitespaces
+  substr    (ankc--anbc) return substring of c characters starting at b
+  begins    (anbm--anx)  return true if an string begins with bm string
+  ends      (anbm--anx)  return true if an string ends with bm string
+  contains  (anbm--anx)    return true if an string contains bm string
+  index     (anbm--anx)  return index of bm string within an string, or -1
+  arein     (anbm--anx)    return true if an string contains any character from bm string
+  haschar   (anc--anx)     return true if an string contains character c
+  char      (ani--anx)   return character at index i in given string
+  upper     (an--an)       destructive change to lowercase
+  lower     (an--an)       destructive change to uppercase
+  ========= ===========  ===============================================================
 
 Performance
 ===========
 .. _fast:
 
+Different dispatching techniques results in different efficiency depending
+on the CPU architecture [1]_.
+
+Fabris offers multiple dispatching strategies in the single VM.
+
+  ============ == ==== ====== ==== ====== ======= ====== ===== ====== ===== ======
+  benchmark     N goto switch call direct repl.sw c.call c.inl python  ENV  VM cfg
+  ============ == ==== ====== ==== ====== ======= ====== ===== ====== ===== ======
+  nested-loops 16  508    862  990    391     518    489  464   15313  E.1    C.0
+  nested-loops 16  398    882  934    287     546    400  369       .  E.1    C.1
+  ============ == ==== ====== ==== ====== ======= ====== ===== ====== ===== ======
+
 Programs are based on Benchmark Tests from http://dada.perl.it/shootout/.
 
-Times are given in milliseconds for best of 5 runs:
+Times are given in milliseconds for best of 5 runs. More benchmarks and results coming soon.
 
-  ============ == ==== ====== ==== ====== ======= ====== ===== ====== ======= =================
-  benchmark     N goto switch call direct repl.sw c.call c.inl python machine fabris config
-  ============ == ==== ====== ==== ====== ======= ====== ===== ====== ======= =================
-  nested-loops  8    8     15   17      6      11      9    7     302      M1 r=IP,SP
-  nested-loops  8    9     16   18      8      10     10    9     302         .
-  nested-loops 16  508    862  990    391     518    489  464   15313         .
-  nested-loops 16  398    882  934    287     546    400  369   15313      M1 r=IP,SP
-  ============ == ==== ====== ==== ====== ======= ====== ===== ====== ======= =================
+Environment:
+  - E.1 - Intel Atom N570 1.66 @ 1.0 GHz, gcc 4.8.4, -O3 -fomit-frame-pointer
 
-M1 - Intel Atom N570 1.66 @ 1.0 GHz
+VM config:
+  - C.0 - default config
+  - C.1 - sp on ESI register, ip on EDI register
 
-More benchmarks and results coming soon.
+
+Related articles:
+
+.. [1] http://www.complang.tuwien.ac.at/forth/threading/
+.. [2] http://www.complang.tuwien.ac.at/forth/threaded-code.html
+.. [3] http://realityforge.org/code/virtual-machines/2011/05/19/interpreters.html
+.. [4] https://en.wikipedia.org/wiki/Threaded_code

@@ -5,7 +5,7 @@
 
 // === CONFIG =========================================
 
-#define OTHER_RUN_FUNCTIONS	0
+#define OTHER_RUN_FUNCTIONS	1
 #define USE_REGISTERS			1
 #define REPL_SWITCH			0
 
@@ -16,11 +16,12 @@ typedef unsigned int token;
 #if USE_REGISTERS
 register token *ip asm ("edi"); // instruction pointer
 register int *sp asm ("esi"); // data stack pointer - grows up
+register token **rp asm ("ebx"); // return stack pointer - grows down
 #else
 token *ip;		// instruction pointer
 int *sp;		// data stack pointer - grows up
-#endif
 token **rp;	// return stack pointer - grows down
+#endif
 
 token *ibase;	// instructions base 
 int *sbase;	// data stack base
@@ -29,7 +30,7 @@ token **rbase;	// return stack base
 #define uint unsigned int
 #define uchar unsigned char
 
-int i;
+int i,j,k;
 int tmp;
 uint utmp;
 
@@ -245,8 +246,19 @@ void run_goto() {
 		sp[1] = sp[0]; 
 		sp += 1;
 		NEXT;
+	op_dup2:
+		sp[2] = sp[0];
+		sp[1] = sp[-1];
+		sp += 2;
+		NEXT;
 	op_drop:
 		sp -= 1;
+		NEXT;
+	op_drop2:
+		sp -= 2;
+		NEXT;
+	op_drop4:
+		sp -= 4;
 		NEXT;
 	op_over:
 		sp[1] = sp[-1];
@@ -402,6 +414,24 @@ void run_goto() {
 		sp += 1;
 		ip += ip[1];
 		JUMP;
+	op_vars: // TEST
+		for (i=0;i<ip[1];i++) {
+			rp[-1-i] = (token*)sp[-i];
+		}
+		sp -= ip[1];
+		rp -= ip[1]+1;
+		rp[0] = (token*)ip[1];
+		ip += 2;
+		JUMP;
+	op_varv: // TEST
+		sp[1] = (int)rp[(int)rp[0]-(int)ip[1]];
+		sp += 1;
+		ip += 2;
+		JUMP;
+	op_retv: // TEST
+		rp += 1+(uint)rp[0];
+		ip=rp[0]; rp+=1;
+		JUMP;
 	// === NEW ============================
 	op_var:
 		ip[1] = sp[0];
@@ -418,6 +448,109 @@ void run_goto() {
 		sp -= 1;
 		ip += 2;
 		JUMP;
+	// === STRING ===========================
+	op_begins:
+		if (sp[0]>sp[-2]) {
+			sp[-1]=0;
+		} else {
+			tmp=1;
+			for (i=0;i<sp[0];i++) {
+				if (((char*)sp[-3])[i] != ((char*)sp[-1])[i]) {
+					tmp=0;
+					break;
+				}
+			}
+			sp[-1]=tmp;
+		}
+		sp -= 1;
+		NEXT;
+	op_ends:
+		if (sp[0]>sp[-2]) {
+			sp[-1]=0;
+		} else {
+			tmp=1;
+			for (i=0;i<sp[0];i++) {
+				if (((char*)sp[-3])[sp[-2]-1-i] != ((char*)sp[-1])[sp[0]-1-i]) {
+					tmp=0;
+					break;
+				}
+			}
+			sp[-1]=tmp;
+		}
+		sp -= 1;
+		NEXT;
+	op_substr:
+		sp[-1] += sp[-3];
+		sp[0] = sp[0];
+		NEXT;
+	op_index:
+		tmp=-1;
+		if (sp[0]<=sp[-2]) {
+			for (i=0;i<sp[-2]-sp[0]+1;i++) {
+				tmp=i;
+				for (j=0;j<sp[0];j++) {
+					if (((char*)sp[-3])[i+j] != ((char*)sp[-1])[j]) {
+						tmp = -1;
+						break;
+					}
+				}
+				if (tmp>=0) break;
+			}
+		}
+		sp[-1] = tmp;
+		sp -= 1;
+		NEXT;
+	op_lstrip:
+		for (i=0;i<sp[0];i++) {
+			if (((char*)sp[-1])[i] > 32) break;
+		}
+		sp[-1] += i;
+		sp[0] -= i;
+		NEXT;
+	op_rstrip:
+		for (i=0;i<sp[0];i++) {
+			if (((char*)sp[-1])[sp[0]-i-1] > 32) break;
+		}
+		sp[0] -= i;
+		NEXT;
+	op_strip:
+		// rstrip
+		for (i=0;i<sp[0];i++) {
+			if (((char*)sp[-1])[sp[0]-i-1] > 32) break;
+		}
+		sp[0] -= i;
+		// lstrip
+		for (i=0;i<sp[0];i++) {
+			if (((char*)sp[-1])[i] > 32) break;
+		}
+		sp[-1] += i;
+		sp[0] -= i;
+		NEXT;
+	op_split:
+		// lstrip
+		for (i=0;i<sp[0];i++) {
+			if (((char*)sp[-1])[i] > 32) break;
+		}
+		sp[-1] += i;
+		sp[0] -= i;
+		// reversed lstrip
+		for (j=0;j<sp[0];j++) {
+			if (((char*)sp[-1])[j] <= 32) break;
+		}
+		sp[1] = sp[-1];
+		sp[2] = j;
+		sp[-1] = sp[-1]+j;
+		sp[0] -= j;
+		sp += 2;
+		NEXT;
+	op_char:
+		if (sp[0]>=0) {
+			sp[0] = ((char*)sp[-2])[sp[0]];
+		} else {
+			sp[0] = ((char*)sp[-2])[sp[-1]+sp[0]];
+		}
+		NEXT;
+		
 }
 
 #undef NEXT
@@ -448,12 +581,12 @@ void runcode() {
 	init(&mem[0],1024,code);
 	
 	run_goto();
-	//~ run_direct();
-	//~ run_call();
-	//~ run_switch();
-	//~ run_repl_switch();
-	//~ run_compiled_call();
-	//~ run_compiled_inline();
+	//run_direct();
+	//run_call();
+	//run_switch();
+	//run_repl_switch();
+	//run_compiled_call();
+	//run_compiled_inline();
 }
 
 int main(int argc, char *argv[]) {

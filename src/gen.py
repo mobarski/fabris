@@ -1,27 +1,5 @@
 source = """
-clock
-
-0
-16 times
-16 times
-	16 times
-	16 times
-		16 times
-		16 times
-			inc
-		loop
-		loop
-	loop
-	loop
-loop
-loop
-dot drop
-
-clock swap sub dot
-"""
-
-source = """
-test 1 2 3 3 ok 2 ok 1 ok 
+"abcdefg" 0 char emit
 """
 
 ##############################################
