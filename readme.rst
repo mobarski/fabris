@@ -206,9 +206,9 @@ More Arithmetic
 String Manipulation
 -------------------
 
-  ========= ===========  ===============================================================
+  ========= ===========  ===================================================================
   name      effect       comments
-  ========= ===========  ===============================================================
+  ========= ===========  ===================================================================
   hash      (an--x)      return hash value for given string (x65599 algorithm)
   split     (an--rxfy)   return first word from a string and the rest of the string
   strip     (an--bx)     return string without leading and trailing whitespaces
@@ -224,7 +224,7 @@ String Manipulation
   char      (ani--anx)   return character at index i in given string
   upper     (an--an)       destructive change to lowercase
   lower     (an--an)       destructive change to uppercase
-  ========= ===========  ===============================================================
+  ========= ===========  ===================================================================
 
 Performance
 ===========
