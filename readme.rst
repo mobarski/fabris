@@ -15,11 +15,14 @@ fast_ and beginner friendly.
 Current Fabris version is unstable and is intended only for experimental use.
 
 The name comes from first leters of main components of Fabris VM:
-(F)ile descriptors, (A)llocators, (B)ase stack, (R)eturn stack, (I)nstruction pointer, (S)tack.
+(F)rame pointer, (A)llocators, (B)ase pointers, (R)eturn stack, (I)nstruction pointer, (S)tack.
 
 Similarity with the name of Italian fencing master Salvator Fabris
 is not a coincidence.
 
+
+..	INSPIRACJA
+	forth,dssp,joy,factor,python,lisp,unix
 
 Basic Syntax
 ============
@@ -61,14 +64,14 @@ Universal loop::
 
 New function definition::
 
-    def square dup mul end
+    def square dup mul ret
 
 New function definition with named parameters::
 
     def energy of h m v as
         m v v mul mul 2 div -- kinetic energy
         h m g mul mul -- potential energy
-        add end
+        add ret
 
 Testing::
 
@@ -82,12 +85,23 @@ Lambda expressions::
 Recurrency::
 
     def print-stack
-        if depth then dot print-stack end end
+        if depth then dot drop print-stack end ret
 
 
 Functions
 =========
 
+..	TODO
+	ile konsumuja komparatory? 0 / 1 / 2 ? moze if zaznacza stos a then dropuje?
+	frame pointer i zmienne lokalne
+	map i fold z joy
+	dot vs peek
+	var vs into vs to vs set vs save
+	local vs global vs const vs state vs static
+	zmiana nazwy tor/fromr:
+	-> tor/tos, stor/rtos, rput/rget, putr/getr, bury/dig,
+	-> cut/paste, store/restore, plant/dig, poke,prod/dig,
+	-> jut,dab,pat/?, lay/raise, lay/pick, keep,save/
 
 Stack Manipulation
 ------------------
@@ -97,21 +111,35 @@ Stack Manipulation
   ======== ========== ========================================================
   swap     (ab--ba)   swap the two top stack items
   dup      (a--aa)    duplicate the top stack item
-  dup2     (ab-abab)  duplicate two top stack items
-  over     (ab--aba)  push the second item on top
   drop     (a--)      discard the top item
-  drop2    (ab--)     discard two top items
-  drop4    (abcd--)   discard four top items
+  over     (ab--aba)  push the second item on top
   nip      (ab--b)    discard the second item
   tuck     (ab--bab)  insert copy of top item before second item
   rot      (abc--bca) rotate the third item to the top
   unrot    (abc--cab) unrotate the top to the third item
-  depth    (--n)      push number of items on stack
-  tor      (a--)      take the top item of and push it onto the return stack
-  fromr    (--x)      take the top item of return stack and push it on top
-  reverse  (?n--?)    reverse order of n top stack items
   ======== ========== ========================================================
 
+
+More Stack Manipulation
+-----------------------
+
+  ======== ============ ===========================================================
+  name     effect       comments
+  ======== ============ ===========================================================
+  dup2     (ab--abab)   duplicate top pair
+  swap2    (abxy--xyab) swap two pairs
+  drop2    (ab--)       drop pair
+  ndrop    (?n--?)      discard n top items (not counting n)
+  depth    (--n)        push number of items on stack
+  tor      (a--)        take the top item of and push it onto the return stack
+  fromr    (--x)        take the top item of return stack and push it on stack
+  reverse  (?n--?)      reverse order of n top stack items
+  mark     (--)         mark stack location (push stack pointer to return stack)
+  count    (--n)        push number of items after the mark, unmark stack
+  push     (?n--)       push n items from stack to return stack
+  pop      (n--?)       pop n items from return stack onto stack
+  revpop   (n--?)       pop n items from return stack onto stack in reverse order
+  ======== ============ ===========================================================
 
 
 Basic Arithmetic
@@ -175,7 +203,8 @@ Other
   nop     (--)     do nothig
   clock   (--x)    returns number of microseconds since the program was launched
   halt    (--)     stops program execution
-  emit    (a--)    prints single character
+  emit    (c--)    write single character to standard output
+  take    (--c)    read single character from standard input
   print   (an--)   prints n characters at address a
   trace   (--)     prints information about VM state - stack, ip, ...
   dot     (a--a)   prints top item as number followed by space
@@ -184,7 +213,8 @@ Other
   argc    (--x)    returns number of program arguments
   argv    (a--xn)  returns address and length of argument number a
   call    (f--)    call function referenced by f
-  ok      (ab--)   do nothing if two top items are equal, halt and print error otherwise 
+  ok      (ab--)   do nothing if two top items are equal, halt and print error otherwise
+  write   (anf--)    write n characters at address a to file with descriptor f
   ======= ======== ======================================================================
 
 
@@ -197,10 +227,10 @@ More Arithmetic
   min       (ab--x)   return lower value
   max       (ab--x)   return greater value
   limit     (xab--y)  limit value of x (aka clamp), if x<a then a, if x>b then b
-  divmul    (abc--x)  ... (a/b*c)
-  muldiv    (abc--x)  ... (a*b/c)
-  muldivmod (abc--xr) ... (a*b/c, a*b%c)
-  divmod    (ab--xr)  ... (a/b, a%b)
+  divmul    (abc--x)    ... (a/b*c)
+  muldiv    (abc--x)    ... (a*b/c)
+  muldivmod (abc--xr)   ... (a*b/c, a*b%c)
+  divmod    (ab--xr)    ... (a/b, a%b)
   ========= ========= ============================================================
 
 
@@ -249,8 +279,10 @@ Fabris offers multiple dispatching strategies in the single VM.
   ============ == ==== ====== ==== ====== ======= ====== ===== ====== ===== ======
   benchmark     N goto switch call direct repl.sw c.call c.inl python  ENV  VM cfg
   ============ == ==== ====== ==== ====== ======= ====== ===== ====== ===== ======
-  nested-loops 16  508    862  990    391     518    489  464   15313  E.1    C.0
-  nested-loops 16  398    882  934    287     546    400  369       .  E.1    C.1
+  nested-loops 16  508    862  990    391     518    489  464   11671  E.1    C.0
+  nested-loops 16  398    882  934    287     546    400  369    7142  E.1    C.1
+  fibonacci    32  867   1043 1183      .     904    520  485    6037  E.1    C.0
+  fibonacci    32  620   1017 1001      .     787    506  401    4524  E.1    C.2
   ============ == ==== ====== ==== ====== ======= ====== ===== ====== ===== ======
 
 Programs are based on Benchmark Tests from http://dada.perl.it/shootout/.
@@ -261,9 +293,9 @@ Environment:
   - E.1 - Intel Atom N570 1.66 @ 1.0 GHz, gcc 4.8.4, -O3 -fomit-frame-pointer
 
 VM config:
-  - C.0 - default config
-  - C.1 - sp on ESI register, ip on EDI register
-
+  - C.0 - Default Fabris config. Python 3.5
+  - C.1 - Fabris registers: sp on ESI, ip on EDI. Python 2.7
+  - C.2 - Fabris registers: sp on ESI, ip on EDI, rp on EBX. Python 2.7
 
 Related articles:
 

@@ -1,5 +1,16 @@
 source = """
-"abcdefg" 0 char emit
+
+def fib (n--x)
+	(n) if 2 lt then drop2 1 ret end
+	(n2) drop
+	(n) dec dup dec
+	fib 
+	swap fib add ret
+
+clock
+32 fib dot drop
+clock swap sub dot
+
 """
 
 ##############################################
@@ -25,7 +36,7 @@ f9 = open('gen/compiled_call.h','w')
 f10 = open('gen/compiled_inline.h','w')
 f11 = open('gen/code_direct.h','w')
 
-ops = re.findall("(?xms) op_([a-z]+): (.*?) (NEXT|JUMP);",raw)
+ops = re.findall("(?xms) op_([a-z][a-z0-9]+): (.*?) (NEXT|JUMP);",raw)
 
 # dispatch
 opcode = {}
@@ -89,7 +100,7 @@ for t in tokens:
 	# conversion
 	try:
 		x = int(t)
-		code += [opcode['push']]
+		code += [opcode['pushx']]
 		code += [x]
 		continue
 	except: pass
@@ -164,7 +175,7 @@ for t in tokens:
 	elif t=='end':
 		here = len(code)
 		kind,there = ctrl.pop(-1)
-		code[there+1] = here-there + 1
+		code[there] = here-there + 1
 	elif t=='var':
 		code += [opcode['var']]
 		def_var = True

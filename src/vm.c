@@ -23,6 +23,8 @@ int *sp;		// data stack pointer - grows up
 token **rp;	// return stack pointer - grows down
 #endif
 
+token **fp;	// frame pointer
+
 token *ibase;	// instructions base 
 int *sbase;	// data stack base
 token **rbase;	// return stack base
@@ -54,11 +56,6 @@ void run_goto() {
 
 	// === OTHER ==================
 	op_nop:
-		NEXT;
-	op_count:
-		sp[1] = *(uchar*)sp[0];
-		sp[0] += 1;
-		sp += 1;
 		NEXT;
 	op_clock:
 		sp[1] = clock();
@@ -97,6 +94,13 @@ void run_goto() {
 			printf("%d ",sp[i]);
 		printf("[%x] ",sp[0]);
 		for (i=-1; i>=-6; i--)
+			printf("%d ",sp[i]);
+		printf("\n");
+		NEXT;
+	op_sprint:
+		printf("depth:%u  ->  ",sp-sbase);
+		printf("[%d] ",sp[0]);
+		for (i=-1; i>=sbase-sp; i--)
 			printf("%d ",sp[i]);
 		printf("\n");
 		NEXT;
@@ -240,25 +244,13 @@ void run_goto() {
 		sp[1] = sp[-1]!=sp[0] ? 1 : 0 ;
 		sp += 1;
 		NEXT;
-	
 	// ===  STACK ==================
 	op_dup:
 		sp[1] = sp[0]; 
 		sp += 1;
 		NEXT;
-	op_dup2:
-		sp[2] = sp[0];
-		sp[1] = sp[-1];
-		sp += 2;
-		NEXT;
 	op_drop:
 		sp -= 1;
-		NEXT;
-	op_drop2:
-		sp -= 2;
-		NEXT;
-	op_drop4:
-		sp -= 4;
 		NEXT;
 	op_over:
 		sp[1] = sp[-1];
@@ -291,6 +283,29 @@ void run_goto() {
 		sp[-1] = sp[-2];
 		sp[-2] = tmp;
 		NEXT;
+	// === MORE STACK ==============
+	op_dup2:
+		sp[2] = sp[0];
+		sp[1] = sp[-1];
+		sp += 2;
+		NEXT;
+	op_swap2:
+		tmp=sp[0];
+		sp[0]=sp[-2];
+		sp[-2]=tmp;
+		tmp=sp[-1];
+		sp[-1]=sp[-3];
+		sp[-3]=tmp;
+		NEXT;
+	op_drop2:
+		sp -= 2;
+		NEXT;
+	op_drop4:
+		sp -= 4;
+		NEXT;
+	op_ndrop:
+		sp -= 1+sp[0];
+		NEXT;
 	op_depth:
 		sp[1] = (uint)(sp-sbase);
 		sp += 1;
@@ -313,6 +328,38 @@ void run_goto() {
 		}
 		sp -= 1;
 		NEXT;
+	op_mark:
+		rp[-1] = (token*)sp;
+		rp -= 1;
+		NEXT;
+	op_count:
+		sp[1] = (int)((token*)sp-rp[0]);
+		rp += 1;
+		sp += 1;
+		NEXT;
+	op_push:
+		for (i=0;i<sp[0];i++) {
+			rp[-1-i] = (token*) sp[-1-i];
+		}
+		rp -= sp[0];
+		sp -= sp[0]+1;
+		NEXT;
+	op_pop:
+		tmp = sp[0];
+		for (i=0;i<tmp;i++) {
+			sp[i]=(int)rp[i];
+		}
+		rp += tmp;
+		sp += tmp-1;
+		NEXT;
+	op_revpop:
+		tmp = sp[0];
+		for (i=0;i<tmp;i++) {
+			sp[i]=(int)rp[tmp-i-1];
+		}
+		rp += tmp;
+		sp += tmp-1;
+		NEXT;
 	// === PUSH ==================
 	op_pushc:
 		sp[1] = (char)ip[1];
@@ -324,12 +371,12 @@ void run_goto() {
 		sp += 1;
 		ip += 2;
 		JUMP;
-	op_push:
+	op_pushx:
 		sp[1] = ip[1];
 		sp += 1;
 		ip += 2;
 		JUMP;
-	op_pushs: // TODO TEST
+	op_pushs:
 		UTMP_LOAD_4();
 		sp[1] = (uint)&ip[2];
 		sp[2] = utmp;
@@ -580,13 +627,13 @@ void runcode() {
 	int mem[1024];
 	init(&mem[0],1024,code);
 	
-	run_goto();
-	//run_direct();
-	//run_call();
+	//run_goto();
 	//run_switch();
+	//run_call();
+	//run_direct();
 	//run_repl_switch();
 	//run_compiled_call();
-	//run_compiled_inline();
+	run_compiled_inline();
 }
 
 int main(int argc, char *argv[]) {
