@@ -1,11 +1,11 @@
 // === RUN CALL =======================================
 
-#include "functions.h"
+#include "gen/functions.h"
 
 void run_call() {
 	void (*f)(void);
 	void *dispatch[] = {
-		#include "dispatch_call.h"
+		#include "gen/dispatch_call.h"
 	};
 	for (;;) {
 		//f = dispatch[*ip];
@@ -24,11 +24,12 @@ void run_call() {
 
 void run_direct() {
 	void *dispatch[] = {
-		#include "code_direct.h"
+		#include "gen/code_direct.h"
 	};
+	ibase=(void*)dispatch;
 	ip = (token*)&dispatch[0];
 	JUMP;
-	#include "run_repl_switch.h"
+	#include "gen/run_repl_switch.h"
 }
 
 #undef NEXT
@@ -42,7 +43,7 @@ void run_direct() {
 void run_switch() {
 	for (;;) {
 		switch (*ip) {
-			#include "run_switch.h"
+			#include "gen/run_switch.h"
 			default: NEXT;
 		}
 	}
@@ -55,11 +56,11 @@ void run_switch() {
 
 #if REPL_SWITCH
 
-#include "repl_switch.h"
+#include "gen/repl_switch.h"
 
 void run_repl_switch() {
 	JUMP;
-	#include "run_repl_switch.h"
+	#include "gen/run_repl_switch.h"
 }
 
 #undef NEXT
@@ -74,10 +75,10 @@ void run_repl_switch() {
 
 void run_compiled_call() {
 	void *dispatch[] = {
-		#include "dispatch_comp.h"
+		#include "gen/dispatch_comp.h"
 	};
 	JUMP;
-	#include "compiled_call.h"
+	#include "gen/compiled_call.h"
 }
 
 #undef NEXT
@@ -91,10 +92,10 @@ void run_compiled_call() {
 
 void run_compiled_inline() {
 	void *dispatch[] = {
-		#include "dispatch_comp.h"
+		#include "gen/dispatch_comp.h"
 	};
 	JUMP;
-	#include "compiled_inline.h"
+	#include "gen/compiled_inline.h"
 }
 
 #undef NEXT

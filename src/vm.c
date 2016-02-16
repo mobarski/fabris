@@ -6,7 +6,7 @@
 // === CONFIG =========================================
 
 #define OTHER_RUN_FUNCTIONS	1
-#define USE_REGISTERS			1
+#define USE_REGISTERS			0
 #define REPL_SWITCH			0
 
 // === CORE ===========================================
@@ -212,36 +212,24 @@ void run_goto() {
 		sp[1] = sp[0] ? 0 : 1 ;
 		sp += 1;
 		NEXT;
-	op_positive:
+	op_plus:
 		sp[1] = sp[0]>0 ? 1 : 0 ;
 		sp += 1;
 		NEXT;
-	op_negative:
+	op_minus:
 		sp[1] = sp[0]<0 ? 1 : 0 ;
 		sp += 1;
 		NEXT;
-	op_le:
-		sp[1] = sp[-1]<=sp[0] ? 1 : 0 ;
-		sp += 1;
-		NEXT;
-	op_lt:
+	op_less:
 		sp[1] = sp[-1]<sp[0] ? 1 : 0 ;
 		sp += 1;
 		NEXT;
-	op_ge:
-		sp[1] = sp[-1]>=sp[0] ? 1 : 0 ;
-		sp += 1;
-		NEXT;
-	op_gt:
+	op_more:
 		sp[1] = sp[-1]>sp[0] ? 1 : 0 ;
 		sp += 1;
 		NEXT;
-	op_eq:
+	op_equal:
 		sp[1] = sp[-1]==sp[0] ? 1 : 0 ;
-		sp += 1;
-		NEXT;
-	op_ne:
-		sp[1] = sp[-1]!=sp[0] ? 1 : 0 ;
 		sp += 1;
 		NEXT;
 	// ===  STACK ==================
@@ -315,7 +303,7 @@ void run_goto() {
 		sp -= 1;
 		rp -= 1;
 		NEXT;
-	op_fromr:
+	op_tos:
 		sp[1] = (uint)rp[0];
 		sp += 1;
 		rp += 1;
@@ -329,11 +317,11 @@ void run_goto() {
 		sp -= 1;
 		NEXT;
 	op_mark:
-		rp[-1] = (token*)sp;
+		rp[-1] = (token*)(sp-sbase);
 		rp -= 1;
 		NEXT;
 	op_count:
-		sp[1] = (int)((token*)sp-rp[0]);
+		sp[1] = (int)(token*)(sp-sbase)-(int)rp[0];
 		rp += 1;
 		sp += 1;
 		NEXT;
@@ -359,6 +347,9 @@ void run_goto() {
 		}
 		rp += tmp;
 		sp += tmp-1;
+		NEXT;
+	op_pick:
+		sp[0] = sp[-sp[0]-1];
 		NEXT;
 	// === PUSH ==================
 	op_pushc:
@@ -627,13 +618,13 @@ void runcode() {
 	int mem[1024];
 	init(&mem[0],1024,code);
 	
-	//run_goto();
+	run_goto();
 	//run_switch();
 	//run_call();
 	//run_direct();
 	//run_repl_switch();
 	//run_compiled_call();
-	run_compiled_inline();
+	//run_compiled_inline();
 }
 
 int main(int argc, char *argv[]) {

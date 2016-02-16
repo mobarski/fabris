@@ -1,15 +1,6 @@
 source = """
 
-def fib (n--x)
-	(n) if 2 lt then drop2 1 ret end
-	(n2) drop
-	(n) dec dup dec
-	fib 
-	swap fib add ret
-
-clock
-32 fib dot drop
-clock swap sub dot
+1 1 mark 1 1 1 count sprint
 
 """
 
