@@ -221,16 +221,13 @@ void run_goto() {
 		sp += 1;
 		NEXT;
 	op_less:
-		sp[1] = sp[-1]<sp[0] ? 1 : 0 ;
-		sp += 1;
+		sp[0] = sp[-1]<sp[0] ? 1 : 0 ;
 		NEXT;
 	op_more:
-		sp[1] = sp[-1]>sp[0] ? 1 : 0 ;
-		sp += 1;
+		sp[0] = sp[-1]>sp[0] ? 1 : 0 ;
 		NEXT;
 	op_equal:
-		sp[1] = sp[-1]==sp[0] ? 1 : 0 ;
-		sp += 1;
+		sp[0] = sp[-1]==sp[0] ? 1 : 0 ;
 		NEXT;
 	// ===  STACK ==================
 	op_dup:

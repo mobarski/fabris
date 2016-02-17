@@ -6,7 +6,7 @@ FABRIS PROGRAMMING LANGUAGE
 Introduction
 ========
 
-Fabris is a `stack-oriented`_, `concatenative`_ language designed to be compact,
+Fabris is a `stack-oriented`_, `concatenative`_ language designed to be compact_,
 fast_ and beginner friendly.
 
 .. _stack-oriented: https://en.wikipedia.org/wiki/Stack-oriented_programming_language
@@ -42,11 +42,11 @@ Stream comment::
 
 Conditional statement::
 
-    if 10 eq then "equals ten" print end
+    if 10 equal then "equals ten" print end
 	
 Conditional statement with alternative::
 
-    if 10 ge then "ten or more" else "nine or less" end
+    if 10 less not then "ten or more" else "nine or less" end
 
 Counted loop::
 
@@ -111,32 +111,32 @@ Functions
 Stack Manipulation
 ------------------
 
-  ======== =========== ============================================================
-  name     effect      comments
-  ======== =========== ============================================================
-  swap     (ab--ba)    swap the two top stack items
-  dup      (a--aa)     duplicate the top stack item
-  drop     (a--)       discard the top item
-  over     (ab--aba)   push the second item on top
-  nip      (ab--b)     discard the second item
-  tuck     (ab--bab)   insert copy of top item before second item
-  rot      (abc--bca)  rotate the third item to the top
-  unrot    (abc--cab)  unrotate the top to the third item
-  depth    (--n)       push number of items on stack
-  tor      (a--)(=a)   take the top item of and push it onto the return stack
-  tos      (--x)(a=)   take the top item of return stack and push it on stack
-  mark     (--)(=n)    mark stack location (push stack pointer to return stack)
-  count    (--x)(n=)   push number of items after the mark, unmark stack
-  yank     (--a)(ab=b) remove second item from return stack and place it on stack
-  ======== =========== ============================================================
+  ======== =========== ============================================================ =====
+  name     effect      comments                                                     core 
+  ======== =========== ============================================================ =====
+  swap     (ab--ba)    swap the two top stack items                                 yes 
+  dup      (a--aa)     duplicate the top stack item                                 yes 
+  drop     (a--)       discard the top item                                         yes 
+  over     (ab--aba)   push the second item on top                                      
+  nip      (ab--b)     discard the second item                                          
+  tuck     (ab--bab)   insert copy of top item before second item                       
+  rot      (abc--bca)  rotate the third item to the top                                 
+  unrot    (abc--cab)  unrotate the top to the third item                               
+  depth    (--n)       push number of items on stack                                yes 
+  tor      (a--)(=a)   move the top item to the return stack                        yes 
+  tos      (--x)(a=)   move the top item of return stack to stack                   yes 
+  mark     (--)(=n)    mark stack location (push stack depth to return stack)           
+  count    (--x)(n=)   push number of items after the mark, unmark stack                
+  yank     (--a)(ab=b) remove second item from return stack and place it on stack       
+  ======== =========== ============================================================ =====
 
 Basic Arithmetic
 ----------------
 
-  ======== ========= ========================================================
-  name     effect    comments
-  ======== ========= ========================================================
-  add      (ab--x)   add two top items (a+b)
+  ======== ========= ======================================================== =====
+  name     effect    comments                                                 core
+  ======== ========= ======================================================== =====
+  add      (ab--x)   add two top items (a+b)                                  yes
   sub      (ab--x)   subtract top item from second item (a-b)
   mul      (ab--x)   multiply two top items (a*b)
   div      (ab--x)   divide second item by top item (a/b)
@@ -144,81 +144,101 @@ Basic Arithmetic
   inc      (a--x)    increment the top item (a+1)
   dec      (a--x)    decrement the top item (a-1)
   abs      (a--x)    return absolute value (abs(a))
-  neg      (a--x)    change the sign (-a)
-  ======== ========= ========================================================
+  neg      (a--x)    change the sign (-a)                                     yes
+  ======== ========= ======================================================== =====
 
 
 Comparators
 -----------
 
-  ======== ========== ========================================================
-  name     effect     comments
-  ======== ========== ========================================================
-  zero     (a--ax)    check if a == 0
-  minus    (a--ax)    check if a < 0
-  plus     (a--ax)    check if a > 0
-  less     (ab--abx)  check if a < b
-  more     (ab--abx)  check if a > b
-  equal    (ab--abx)  check if a == b
-  within   (nab--nx)  check if a <= n < b
-  ======== ========== ========================================================
+  ======== ========== ======================================================== =====
+  name     effect     comments                                                 core
+  ======== ========== ======================================================== =====
+  zero     (a--ax)    check if a == 0                                          yes 
+  minus    (a--ax)    check if a < 0                                           yes 
+  plus     (a--ax)    check if a > 0                                           
+  less     (ab--ax)   check if a < b                                           
+  more     (ab--ax)   check if a > b                                           
+  equal    (ab--ax)   check if a == b                                          
+  within   (nab--nx)  check if a <= n < b                                      
+  ======== ========== ======================================================== =====
 
 Logic
 -----
 
-  ===== ======== ========================================================
-  name  effect   comments
-  ===== ======== ========================================================
-  and   (ab--x)  and two top items (a&b)
-  or    (ab--x)  or two top items (a|b)
-  xor   (ab--x)  xor two top items (a^b)
+  ===== ======== ============================================== =====
+  name  effect   comments                                       core
+  ===== ======== ============================================== =====
+  and   (ab--x)  and two top items (a&b)                        yes
+  or    (ab--x)  or two top items (a|b)                         yes
+  xor   (ab--x)  xor two top items (a^b)                        ?
   shl   (ab--x)  shift a left by b bits (a<<b)
   shr   (ab--x)  shift a right by b bits (a>>b)
   ushr  (ab--x)  shift unsigned a right by b bits (a>>b)
   inv   (a--x)   invert all bits (~a)
-  not   (a--x)   logical negation (!a)
-  ===== ======== ========================================================
+  not   (a--x)   logical negation (!a)                          yes
+  ===== ======== ============================================== =====
 
 
 Input/Output
 ------------
 
-  ======= ======== ======================================================================
-  name    effect   comments
-  ======= ======== ======================================================================
-  emit    (c--)    write single character to standard output
-  take    (--c)      read single character from standard input
+  ======= ======== ================================================================ =====
+  name    effect   comments                                                         core
+  ======= ======== ================================================================ =====
+  emit    (c--)    write single character to standard output                        yes
+  take    (--c)      read single character from standard input                      opt.
   print   (an--)   prints n characters at address a
-  argc    (--x)    returns number of program arguments
-  argv    (a--xn)  returns address and length of argument number a
+  argc    (--x)    returns number of program arguments                              opt.
+  argv    (a--xn)  returns address and length of argument number a                  opt.
   dot     (a--a)   prints top item as number followed by space
   udot    (a--a)   prints top item as unsigned number followed by space
   xdot    (a--a)   prints top item as hexadecimal number followed by a space
   write   (anf--)    write n characters at address a to file with descriptor f
-  ======= ======== ======================================================================
+  ======= ======== ================================================================ =====
 
+Control Flow
+------------
+
+  ======= ======== ================================================================ =====
+  name    effect   comments                                                         core
+  ======= ======== ================================================================ =====
+  def X   (--)     define new word X                                                yes
+  ret     (--)     return from definition                                           yes
+  then    (x--)    execute following code if x is not zero                          yes
+  else    (--)     alternative code for the then word (optional)                    yes
+  end     (--)     finish then/else sequence                                        yes
+  do      (--)     start of unconditioned loop                                      yes
+  break   (--)     break out of the current loop                                    yes
+  loop    (--)     repeat loop                                                      yes
+  times   (x--)    start of counted loop
+  "X"     (--an)   start/end of a string, places addres and length on the stack     yes
+  [       (--)     start of anonymous code block                                    yes
+  ]       (--f)    end of anonymous code block                                      yes
+  call    (f--)    call code block referenced by f                                  yes
+  'X'     (--c)    start/end of a char
+  ======= ======== ================================================================ =====
 
 Other
 -----
 
-  ======= ======== ======================================================================
-  name    effect   comments
-  ======= ======== ======================================================================
+  ======= ======== ================================================================ =====
+  name    effect   comments                                                         core
+  ======= ======== ================================================================ =====
   nop     (--)     do nothig
-  clock   (--x)    returns number of microseconds since the program was launched
-  halt    (--)     stops program execution
-  call    (f--)    call function referenced by f
-  ok      (ab--)   do nothing if two top items are equal, halt and print error otherwise
+  clock   (--x)    returns number of microseconds since the program was launched    opt.
+  halt    (--)     stops program execution                                          yes
+  ok      (ab--)   halt and print error if two top items are not equal
   trace   (--)     prints information about VM state - stack, ip, ...
   sprint  (--)     prints stack
-  ======= ======== ======================================================================
+  ======= ======== ================================================================ =====
 
 String Manipulation
 -------------------
 
-  ========= ============ ===================================================================
-  name      effect       comments
-  ========= ============ ===================================================================
+  ========= ============ =========================================================== =====
+  name      effect       comments                                                    core
+  ========= ============ =========================================================== =====
   hash      (an--x)      return hash value for given string (x65599 algorithm)
   split     (an--rxfy)   return first word from a string and the rest of the string
   strip     (an--bx)     return string without leading and trailing whitespaces
@@ -226,10 +246,10 @@ String Manipulation
   rstrip    (an--bx)     return string without trailing whitespaces
   substr    (ankc--anbc) return substring of c characters starting at b
   index     (anbm--anx)  return index of bm string within an string, or -1
-  char      (ani--anx)   return character at index i in given string
+  char      (ani--anx)   return character at index i in given string                 yes
   upper     (an--an)       destructive change to lowercase
   lower     (an--an)       destructive change to uppercase
-  ========= ============ ===================================================================
+  ========= ============ =========================================================== =====
 
 
 String Comparators
@@ -318,3 +338,21 @@ Related articles:
 .. [2] http://www.complang.tuwien.ac.at/forth/threaded-code.html
 .. [3] http://realityforge.org/code/virtual-machines/2011/05/19/interpreters.html
 .. [4] https://en.wikipedia.org/wiki/Threaded_code
+
+
+Minimalism
+==========
+.. _compact:
+
+One of the design goals of Fabris is to be compact. That is why the language is divided
+into core words and extension words. Fabris implementation needs only to natively handle
+core words to provide ability to compile any Fabris program as every extension word
+can be writen in Fabris using only core words. In practice most standard Fabris words
+are natively implemented because they are designed to be easily implemented in C.
+
+Fabris core words:
+  - 12 control flow words: def, ret, then, else, end, [, ], call, ", do, break, loop
+  - 6 stack manipulation words: swap, dup, drop, tos, tor, depth
+  - 7 arithmetic and logic words: add, neg, zero, minus, and, or, not
+  - 3 other words: emit, char, halt
+  - 4 optional words: clock, take, argc, argv
