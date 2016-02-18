@@ -1,6 +1,14 @@
 source = """
 
-1 1 mark 1 1 1 count sprint
+def myret tos drop ret
+def aaa inline
+
+nop
+def bbb aaa ret
+nop
+
+bbb
+sprint
 
 """
 
@@ -14,7 +22,17 @@ try:
 	os.mkdir('gen')
 except: pass
 
-raw = open('vm.c','r').read()
+raw = ""
+for fn in """
+op_other.h 
+op_alu.h
+op_stack.h
+op_flow.h
+op_string.h
+vm.c
+""".split():
+	raw += open(fn,'r').read()
+
 f1 = open('gen/dispatch.h','w')
 f2 = open('gen/functions.h','w')
 f3 = open('gen/code.h','w')
@@ -80,10 +98,12 @@ code = []
 ctrl = []
 var = {}
 word = {}
+inline = {} # name -> (start,len)
 op_ips = set()
 def_var = False
 into_var = False
 def_word = False
+curr_def = ''
 
 for t in tokens:
 	op_ips.add(len(code))
@@ -104,6 +124,7 @@ for t in tokens:
 		continue
 	elif def_word:
 		word[t] = len(code)
+		curr_def = t
 		def_word = False
 		continue
 	elif into_var:
@@ -153,11 +174,11 @@ for t in tokens:
 		if kind=='times':
 			code[there] = here-there
 	elif t=='then':
-		code += [opcode['jumpz']]
+		code += [opcode['skipz']]
 		ctrl += [('then',len(code))]
 		code += [0]
 	elif t=='else':
-		code += [opcode['jump']]
+		code += [opcode['skip']]
 		here = len(code)
 		kind,there = ctrl.pop(-1)
 		code[there+1] = here-there + 3
@@ -174,7 +195,7 @@ for t in tokens:
 		code += [opcode['into']]
 		into_var = True
 	elif t=='def':
-		code += [opcode['jump']]
+		code += [opcode['skip']]
 		ctrl += [('def',len(code))]
 		code += [0]
 		def_word = True
@@ -189,6 +210,11 @@ for t in tokens:
 		here = len(code)
 		kind,there = ctrl.pop(-1)
 		code[there] = here-there + 1
+	elif t=='inline':
+		here = len(code)
+		kind,there = ctrl.pop(-1)
+		code[there] = here-there + 1
+		inline[curr_def] = (word[curr_def],here-there-1)
 	elif t=='[':
 		code += [opcode['lambda']]
 		ctrl += [('lambda',len(code))]
@@ -204,6 +230,10 @@ for t in tokens:
 	elif t in var:
 		code += [opcode['pushv']]
 		code += [var[t]]
+	elif t in inline:
+		start,cnt = inline[t]
+		for i in range(cnt):
+			code += [code[start+i]]
 	elif t in word:
 		code += [opcode['callx']]
 		code += [word[t]]
@@ -234,3 +264,5 @@ for i,x in enumerate(code):
 		f11.write('&&op_%s, // ip=%d\n'%(opname[x],i))
 	else:
 		f11.write('(void*) %d, // ip=%d\n'%(x,i))
+
+print(inline)
