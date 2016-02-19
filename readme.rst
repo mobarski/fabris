@@ -4,7 +4,7 @@ FABRIS PROGRAMMING LANGUAGE
 
 
 Introduction
-========
+============
 
 Fabris is a `stack-oriented`_, `concatenative`_ language designed to be compact_,
 fast_ and beginner friendly.
@@ -160,7 +160,7 @@ Comparators
   less     (ab--ax)   check if a < b                                           
   more     (ab--ax)   check if a > b                                           
   equal    (ab--ax)   check if a == b                                          
-  within   (nab--nx)  check if a <= n < b                                      
+  within   (nab--nx)  check if a <= n <= b                                     
   ======== ========== ======================================================== =====
 
 Logic
@@ -217,6 +217,8 @@ Control Flow
   ]       (--f)    end of anonymous code block                                      yes
   call    (f--)    call code block referenced by f                                  yes
   'X'     (--c)    start/end of a char
+  X       (--x)    place integer X in the stack                                     yes
+  inline  (--)     end definition, inline this definition on use                    yes
   ======= ======== ================================================================ =====
 
 Other
@@ -228,6 +230,8 @@ Other
   nop     (--)     do nothig
   clock   (--x)    returns number of microseconds since the program was launched    opt.
   halt    (--)     stops program execution                                          yes
+  peek    (a--c)   get character (unsigned) from address a                          opt.
+  poke    (ca--)   set character at addres a to c                                   opt.
   ok      (ab--)   halt and print error if two top items are not equal
   trace   (--)     prints information about VM state - stack, ip, ...
   sprint  (--)     prints stack
@@ -277,8 +281,8 @@ More Stack Manipulation
   drop2    (ab--)       drop pair
   pick     (n--x)       pick nth stack item from top (not counting n)
   ndrop    (?n--?)      discard n top items (not counting n)
-  reverse  (?n--?)      reverse order of n top stack items
-  reverse2 (?n--?)        reverse order of n top stack pairs
+  reverse  (?n--?n)     reverse order of n top stack items
+  reverse2 (?n--?n)       reverse order of n top stack pairs
   push     (?n--)       push n items from stack to return stack
   revpush  (?n--)         push n items from stack to return stack in reverse order
   pop      (n--?)       pop n items from return stack onto stack

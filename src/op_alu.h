@@ -117,3 +117,8 @@
 	op_equal:
 		sp[0] = sp[-1]==sp[0] ? 1 : 0 ;
 		NEXT;
+	
+	op_within:
+		sp[-1] = ((sp[-1]<=sp[-2]) & (sp[-2]<=sp[0])) ? 1 : 0 ;
+		sp -= 1;
+		NEXT;

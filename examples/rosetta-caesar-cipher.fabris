@@ -1,0 +1,22 @@
+--
+-- http://rosettacode.org/wiki/Caesar_cipher
+--
+
+use string
+
+def print-caesar of a n k as
+	a n
+	do each-char
+		if	'a' 'z' within 	then 'a' 1
+		elif	'A' 'Z' within 	then 'A' 1
+						else 0 0 end
+		if (1) then
+			sub k add 26 mod if minus then 26 add end
+		else drop end
+		emit
+	loop
+	"\n" print
+	ret
+
+"The lazy major was fixing Cupid's broken quiver." 13 print-caesar
+"" -13 print-caesar

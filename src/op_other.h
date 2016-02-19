@@ -93,3 +93,12 @@
 		sp[-1] = utmp;
 		sp -= 1;
 		NEXT;
+	
+	op_peek:
+		sp[0] = ((uchar*)sp[0])[0];
+		NEXT;
+	
+	op_poke:
+		((char*)sp[0])[0] = (char)sp[-1];
+		sp -= 2;
+		NEXT;

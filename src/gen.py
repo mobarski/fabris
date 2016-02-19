@@ -1,14 +1,6 @@
 source = """
 
-def myret tos drop ret
-def aaa inline
-
-nop
-def bbb aaa ret
-nop
-
-bbb
-sprint
+"xyz" tor dup 'v' swap poke tos print
 
 """
 
@@ -81,6 +73,8 @@ f6.write("}\n\n")
 for i,(op,body,kind) in enumerate(ops):
 	f7.write('op_%s:%s%s;\n' % (op,body,kind))
 
+############################################
+############################################
 ############################################
 
 regexp = """(?x)
@@ -241,6 +235,10 @@ for t in tokens:
 		code += [opcode[t]]
 print(code)
 print(ctrl)
+
+#############################################
+#############################################
+#############################################
 
 for i,x in enumerate(code):
 	if i in op_ips:

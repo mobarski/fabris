@@ -1,20 +1,24 @@
-	// === PUSH ==================
-	op_pushc: //ARG
+// === PUSH ==================
+
+	op_pushc: //ARG 1
 		sp[1] = (char)ip[1];
 		sp += 1;
 		ip += 2;
 		JUMP;
-	op_pushuc: //ARG
+		
+	op_pushuc: //ARG 1
 		sp[1] = (uchar)ip[1];
 		sp += 1;
 		ip += 2;
 		JUMP;
-	op_pushx: //ARG
+		
+	op_pushx: //ARG 1234
 		sp[1] = ip[1];
 		sp += 1;
 		ip += 2;
 		JUMP;
-	op_pushs: //ARG
+		
+	op_pushs: //ARG 12.34
 		UTMP_LOAD_4();
 		sp[1] = (uint)&ip[2];
 		sp[2] = utmp;
@@ -26,24 +30,29 @@
 		}
 		JUMP;
 	
-	// ===  FLOW ===============
-	op_skip: //ARG
+// ===  FLOW ===============
+		
+	op_skip: //ARG 12
 		ip += (token)ip[1];
 		JUMP;
-	op_back: //ARG
+		
+	op_back: //ARG 12
 		ip -= (token)ip[1];
 		JUMP;
-	op_callx: //ARG
+		
+	op_callx: //ARG 1234
 		UTMP_LOAD_4();
 		rp[-1] = ip+2; // TODO vs token size
 		rp -= 1;
 		ip = ibase+utmp;
 		JUMP;
-	op_tailcallx: //ARG
+		
+	op_tailcallx: //ARG 1234
 		UTMP_LOAD_4();
 		ip = ibase+utmp;
 		JUMP;
-	op_times: //ARG
+		
+	op_times: //ARG 12
 		if (rp[0]==0) {
 			rp += 1;
 			ip += (token)ip[1]+2;
@@ -53,23 +62,22 @@
 			ip += 2;
 		}
 		JUMP;
-	op_jump: //ARG
-		TMP_LOAD_4();
-		ip += tmp;
-		JUMP;
-	op_skipz: //ARG
+
+	op_skipz: //ARG 12
 		if (sp[0]==0) {
 			TMP_LOAD_4();
 			ip+=tmp;
 		} else {ip+=2;}
 		sp -= 1;
 		JUMP;
-	op_lambda: //ARG
+		
+	op_lambda: //ARG 12
 		sp[1] = (uint)&ip[2];
 		sp += 1;
 		ip += ip[1];
 		JUMP;
-	op_vars: // TEST  //ARG
+		
+	op_vars: // TEST  //ARG 1
 		for (i=0;i<ip[1];i++) {
 			rp[-1-i] = (token*)sp[-i];
 		}
@@ -78,36 +86,46 @@
 		rp[0] = (token*)ip[1];
 		ip += 2;
 		JUMP;
-	op_varv: // TEST  //ARG
+		
+	op_varv: // TEST  //ARG 1
 		sp[1] = (int)rp[(int)rp[0]-(int)ip[1]];
 		sp += 1;
 		ip += 2;
 		JUMP;
+		
 	op_call:
 		rp[-1] = ip+1;
 		ip = (token*)sp[0];
 		rp -= 1;
 		sp -= 1;
 		JUMP;
+		
 	op_ret:
 		ip=rp[0]; rp+=1;
 		JUMP;
+		
 	op_retv: // TEST 
 		rp += 1+(uint)rp[0];
 		ip=rp[0]; rp+=1;
 		JUMP;
-	// === ??? ============================
-	op_var:  //ARG
+		
+// === ??? ============================
+
+// TODO change to be able to run from ROM
+
+	op_var:  //ARG 4
 		ip[1] = sp[0];
 		sp -= 1;
 		ip += 2;
 		JUMP;
-	op_pushv: //ARG
+		
+	op_pushv: //ARG 4
 		sp[1] = ibase[ip[1]];
 		sp += 1;
 		ip += 2;
 		JUMP;
-	op_into: //ARG
+
+	op_into: //ARG 4
 		ibase[ip[1]] = sp[0];
 		sp -= 1;
 		ip += 2;

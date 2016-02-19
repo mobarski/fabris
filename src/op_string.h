@@ -1,4 +1,5 @@
-	// === STRING ===========================
+// === STRING ===========================
+
 	op_begins:
 		if (sp[0]>sp[-2]) {
 			sp[-1]=0;
@@ -14,6 +15,7 @@
 		}
 		sp -= 1;
 		NEXT;
+		
 	op_ends:
 		if (sp[0]>sp[-2]) {
 			sp[-1]=0;
@@ -29,10 +31,12 @@
 		}
 		sp -= 1;
 		NEXT;
+		
 	op_substr:
 		sp[-1] += sp[-3];
 		sp[0] = sp[0];
 		NEXT;
+		
 	op_index:
 		tmp=-1;
 		if (sp[0]<=sp[-2]) {
@@ -50,6 +54,7 @@
 		sp[-1] = tmp;
 		sp -= 1;
 		NEXT;
+		
 	op_lstrip:
 		for (i=0;i<sp[0];i++) {
 			if (((char*)sp[-1])[i] > 32) break;
@@ -57,12 +62,14 @@
 		sp[-1] += i;
 		sp[0] -= i;
 		NEXT;
+		
 	op_rstrip:
 		for (i=0;i<sp[0];i++) {
 			if (((char*)sp[-1])[sp[0]-i-1] > 32) break;
 		}
 		sp[0] -= i;
 		NEXT;
+		
 	op_strip:
 		// rstrip
 		for (i=0;i<sp[0];i++) {
@@ -76,6 +83,7 @@
 		sp[-1] += i;
 		sp[0] -= i;
 		NEXT;
+		
 	op_split:
 		// lstrip
 		for (i=0;i<sp[0];i++) {
@@ -93,6 +101,7 @@
 		sp[0] -= j;
 		sp += 2;
 		NEXT;
+
 	op_char:
 		if (sp[0]>=0) {
 			sp[0] = ((char*)sp[-2])[sp[0]];
@@ -100,4 +109,5 @@
 			sp[0] = ((char*)sp[-2])[sp[-1]+sp[0]];
 		}
 		NEXT;
+
 		
