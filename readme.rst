@@ -188,6 +188,7 @@ Input/Output
   ======= ======== ================================================================ =====
   emit    (c--)    write single character to standard output                        yes
   take    (--c)      read single character from standard input                      opt.
+  untake  (c--)      unread single character from standard input                    opt.
   print   (an--)   prints n characters at address a
   argc    (--x)    returns number of program arguments                              opt.
   argv    (a--xn)  returns address and length of argument number a                  opt.
