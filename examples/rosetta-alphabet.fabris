@@ -1,0 +1,7 @@
+-- http://rosettacode.org/wiki/Generate_lower_case_ASCII_alphabet
+
+'a'
+26 times
+    dup emit inc
+loop
+drop
