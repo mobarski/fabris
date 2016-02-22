@@ -63,6 +63,8 @@ Universal loop::
         patrol-area
     loop
     exterminate
+    exterminate
+    exterminate
 
 New function definition::
 

@@ -1,14 +1,12 @@
--- rosettecode.org a+b
+-- http://rosettacode.org/wiki/A%2BB
 
--- without untake
+-- with take-num
 2 times
-	take if '-' equal then drop -1 0 else 1 swap '0' sub end
-	do
-		take if ' ' equal then drop (sign sum) mul break end
-		'0' sub swap 10 mul add
-	loop
+	take-num
+	take (val sep) drop
 loop
 add dot
+
 
 -- with untake
 2 times
@@ -21,9 +19,13 @@ add dot
 loop
 add dot
 
--- with take-num
+
+-- without take-num and take-num
 2 times
-	take-num
-	take drop
+	take if '-' equal then drop -1 0 else 1 swap '0' sub end
+	do
+		take if ' ' equal then drop (sign sum) mul break end
+		'0' sub swap 10 mul add
+	loop
 loop
 add dot
