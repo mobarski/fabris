@@ -1,0 +1,5 @@
+-- http://rosettacode.org/wiki/Strip_whitespace_from_a_string/Top_and_tail
+
+" \r \n \t first string with spaces \t \r \n " lstrip
+"\r \n \t second string with spaces \t \r \n " rstrip
+" \r \n \t third string with spaces \t \r \n " strip
