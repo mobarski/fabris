@@ -1,0 +1,14 @@
+-- http://rosettacode.org/wiki/Even_or_odd
+
+-- modulo version 
+def even (a--x)
+    2 mod ret
+def odd (a--x)
+    even not ret
+
+-- bit version
+def even (a--x)
+    1 and ret
+def odd (a--x)
+    even not ret
+

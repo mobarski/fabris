@@ -2,30 +2,30 @@
 
 -- with take-num
 2 times
-	take-num
-	take (val sep) drop
+    take-num
+    take (val sep) drop
 loop
 add dot
 
 
 -- with untake
 2 times
-	take if '-' equal then drop -1 else drop 1 untake end
-	0 (sign sum)
-	do
-		take if ' ' equal then drop (sign sum) mul break end
-		'0' sub swap 10 mul add
-	loop
+    take if '-' equal then drop -1 else drop 1 untake end
+    0 (sign sum)
+    do
+        take if ' ' equal then drop (sign sum) mul break end
+        '0' sub swap 10 mul add
+    loop
 loop
 add dot
 
 
 -- without take-num and take-num
 2 times
-	take if '-' equal then drop -1 0 else 1 swap '0' sub end
-	do
-		take if ' ' equal then drop (sign sum) mul break end
-		'0' sub swap 10 mul add
-	loop
+    take if '-' equal then drop -1 0 else 1 swap '0' sub end
+    do
+        take if ' ' equal then drop (sign sum) mul break end
+        '0' sub swap 10 mul add
+    loop
 loop
 add dot
