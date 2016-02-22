@@ -1,7 +1,7 @@
 clock
 0
 100000 times
-	inc inc inc inc 3 add 2 sub 4 mul 4 div inc inc inc
+    inc inc inc inc 3 add 2 sub 4 mul 4 div inc inc inc
 loop
 drop
 clock swap sub dot

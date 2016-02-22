@@ -18,11 +18,11 @@ Frost Robert -----------------------
 """
 
 do each-line
-	mark
-	do each-word
-		swap2 loop
-	count
-	2 div times
-		print ' ' emit loop
-	"\n" print
+    mark
+    do each-word
+        swap2 loop
+    count
+    2 div times
+        print ' ' emit loop
+    "\n" print
 loop

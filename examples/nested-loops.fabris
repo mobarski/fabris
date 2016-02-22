@@ -2,7 +2,7 @@ clock
 16 var x
 0
 x times x times x times x times x times x times 
-	inc
+    inc
 loop loop loop loop loop loop 
 dot drop
 clock swap sub 1000 div dot '\n' emit
