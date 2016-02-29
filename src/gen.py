@@ -1,9 +1,26 @@
 source = """
 
-use test
+use string
 
-hello
+"this is a test"
+do each-word
+    '>' emit
+    print
+    '<' emit
+    "\n" print
+loop
 
+"""
+
+source = """
+1
+do
+	2
+	break
+	3
+loop
+4
+sprint
 """
 
 ##############################################
@@ -93,23 +110,35 @@ def tokenize(text):
 
 tokens = tokenize(source)
 tokens+=['halt']
-print(tokens)
 code = []
 ctrl = []
 var = {}
 word = {}
+macro = {} # name -> [tokens]
 inline = {} # name -> (start,len)
 mods = set()
 op_ips = set()
 def_var = False
 into_var = False
 def_word = False
+def_macro = False
 use_mod = False
 curr_def = ''
+curr_macro = ''
+out_tokens = []
 
 
 while tokens:
 	t = tokens.pop(0)
+
+	if curr_macro:
+		if t=='inline':
+			curr_macro = ''
+		else:
+			macro[curr_macro] += [t]
+		continue
+
+	out_tokens += [t]
 
 	op_ips.add(len(code))
 	
@@ -144,6 +173,10 @@ while tokens:
 			tokens[0:0] = mod_tokens
 		use_mod = False
 		continue
+	elif def_macro:
+		macro[t] = []
+		curr_macro = t
+		def_macro = False
 	
 	if t[0]=='(':
 		continue
@@ -178,14 +211,27 @@ while tokens:
 		ctrl += [('times',len(code))]
 		code += [0]
 	elif t=='do':
-		ctrl += [('do',len(code)+1)]
+		code += [opcode['do']]
+		ctrl += [('do',len(code))]
+		code += [0]
 	elif t=='loop':
 		code += [opcode['back']]
 		here = len(code)
-		kind,there = ctrl.pop(-1)
-		code += [here-there]
-		if kind=='times':
-			code[there] = here-there
+		pprint(ctrl)
+		while True:
+			kind,there = ctrl.pop(-1)
+			if kind=='times':
+				code += [here-there]
+				code[there] = here-there
+				break
+			elif kind=='do':
+				code += [here-there-2]
+				code[there] = here-there+2
+				break
+			else:
+				raise('ERROR: loop')
+	elif t=='break':
+		code += [opcode['break']]
 	elif t=='then':
 		code += [opcode['skipz']]
 		ctrl += [('then',len(code))]
@@ -223,11 +269,6 @@ while tokens:
 		here = len(code)
 		kind,there = ctrl.pop(-1)
 		code[there] = here-there + 1
-	elif t=='inline':
-		here = len(code)
-		kind,there = ctrl.pop(-1)
-		code[there] = here-there + 1
-		inline[curr_def] = (word[curr_def],here-there-1)
 	elif t=='[':
 		code += [opcode['lambda']]
 		ctrl += [('lambda',len(code))]
@@ -241,7 +282,11 @@ while tokens:
 		continue
 	elif t=='use':
 		use_mod = True
+	elif t=='macro':
+		def_macro = True
 	###
+	elif t in macro:
+		tokens[0:0] = macro[t]
 	elif t in var:
 		code += [opcode['pushv']]
 		code += [var[t]]
@@ -254,6 +299,7 @@ while tokens:
 		code += [word[t]]
 	else:
 		code += [opcode[t]]
+print(out_tokens)
 print(code)
 print(ctrl)
 

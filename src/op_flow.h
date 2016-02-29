@@ -62,6 +62,17 @@
 			ip += 2;
 		}
 		JUMP;
+	
+	op_do: //ARG 12
+		rp[-1] = (token*)(ip+ip[1]-ibase);
+		rp -= 1;
+		ip += 2;
+		JUMP;
+	
+	op_break:
+		ip = ibase+(int)rp[0];
+		rp += 1;
+		JUMP;
 
 	op_skipz: //ARG 12
 		if (sp[0]==0) {

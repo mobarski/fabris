@@ -213,11 +213,13 @@ Control Flow
   ======= ======== ================================================================ =====
   def X   (--)     define new word X                                                yes
   ret     (--)     return from definition                                           yes
+  macro X (--)     define new macro X                                               yes
+  inline  (--)     end macro definition                                             yes
   then    (x--)    execute following code if x is not zero                          yes
   else    (--)     alternative code for the then word (optional)                    yes
   end     (--)     finish then/else sequence                                        yes
-  do      (--)     start of unconditioned loop                                      yes
-  break   (--)     break out of the current loop                                    yes
+  do      (--x)    start of unconditioned loop                                      yes
+  break   (x--)    break out of the current loop                                    yes
   loop    (--)     repeat loop                                                      yes
   times   (x--)    start of counted loop
   "X"     (--an)   start/end of a string, places addres and length on the stack     yes
@@ -226,7 +228,6 @@ Control Flow
   call    (f--)    call code block referenced by f                                  yes
   'X'     (--c)    start/end of a char
   X       (--x)    place integer X in the stack                                     yes
-  inline  (--)     end definition, inline this definition on use                    yes
   use X   (--)     use module X                                                     yes
   ======= ======== ================================================================ =====
 
