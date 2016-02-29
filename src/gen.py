@@ -1,6 +1,8 @@
 source = """
 
-"xyz" tor dup 'v' swap poke tos print
+use test
+
+hello
 
 """
 
@@ -77,15 +79,19 @@ for i,(op,body,kind) in enumerate(ops):
 ############################################
 ############################################
 
-regexp = """(?x)
-	-- [^\n]* \n
-|	[(] [^)]* [)]
-|	" [^"]* "
-|	' [^']* '
-|	\[ | \]
-|	[a-z0-9+-]+
-"""
-tokens = re.findall(regexp,source)
+def tokenize(text):
+	regexp = """(?x)
+		-- [^\n]* \n
+	|	[(] [^)]* [)]
+	|	" [^"]* "
+	|	' [^']* '
+	|	\[ | \]
+	|	[a-z0-9+-]+
+	"""
+	tokens = re.findall(regexp,text)
+	return tokens
+
+tokens = tokenize(source)
 tokens+=['halt']
 print(tokens)
 code = []
@@ -93,13 +99,18 @@ ctrl = []
 var = {}
 word = {}
 inline = {} # name -> (start,len)
+mods = set()
 op_ips = set()
 def_var = False
 into_var = False
 def_word = False
+use_mod = False
 curr_def = ''
 
-for t in tokens:
+
+while tokens:
+	t = tokens.pop(0)
+
 	op_ips.add(len(code))
 	
 	# conversion
@@ -124,6 +135,14 @@ for t in tokens:
 	elif into_var:
 		code += [var[t]]
 		into_var = False
+		continue
+	elif use_mod:
+		if t not in mods:
+			fn = os.path.join('mod',t+'.fabris') # TODO module paths
+			mod_code = open(fn,'r').read()
+			mod_tokens = tokenize(mod_code)
+			tokens[0:0] = mod_tokens
+		use_mod = False
 		continue
 	
 	if t[0]=='(':
@@ -220,6 +239,8 @@ for t in tokens:
 		code[there] = here-there + 1
 	elif t in ['test','if']:
 		continue
+	elif t=='use':
+		use_mod = True
 	###
 	elif t in var:
 		code += [opcode['pushv']]

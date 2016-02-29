@@ -93,6 +93,13 @@ List reduction::
 
     [1 3 5 7 9] list [add] fold -- sum all elements
 
+Include module::
+
+    use string
+    do each-word
+	print
+    loop
+
 Functions
 =========
 
@@ -220,6 +227,7 @@ Control Flow
   'X'     (--c)    start/end of a char
   X       (--x)    place integer X in the stack                                     yes
   inline  (--)     end definition, inline this definition on use                    yes
+  use X   (--)     use module X                                                     yes
   ======= ======== ================================================================ =====
 
 Other
