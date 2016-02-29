@@ -1,0 +1,1107 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>FABRIS PROGRAMMING LANGUAGE &mdash; Fabris  documentation</title>
+    
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="Fabris  documentation" href="#" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="#" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="nav-item nav-item-0"><a href="#">Fabris  documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="fabris-programming-language">
+<h1>FABRIS PROGRAMMING LANGUAGE<a class="headerlink" href="#fabris-programming-language" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>Fabris is a <a class="reference external" href="https://en.wikipedia.org/wiki/Stack-oriented_programming_language">stack-oriented</a>, <a class="reference external" href="https://en.wikipedia.org/wiki/Concatenative_programming_language">concatenative</a> language designed to be <a class="reference internal" href="#compact">compact</a>,
+<a class="reference internal" href="#fast">fast</a> and beginner friendly.</p>
+<p>Current Fabris version is unstable and is intended only for experimental use.</p>
+<p>The name comes from first leters of main components of Fabris VM:
+(F)rame pointer, (A)llocators, (B)ase pointers, (R)eturn stack, (I)nstruction pointer, (S)tack.</p>
+<p>Similarity with the name of Italian fencing master Salvator Fabris
+is not a coincidence.</p>
+</div>
+<div class="section" id="basic-syntax">
+<h2>Basic Syntax<a class="headerlink" href="#basic-syntax" title="Permalink to this headline">¶</a></h2>
+<p>Basic expressions:</p>
+<div class="highlight-python"><div class="highlight"><pre>&quot;the answer is &quot; print 40 2 add dot
+</pre></div>
+</div>
+<p>Line comment:</p>
+<div class="highlight-python"><div class="highlight"><pre>&quot;hello world&quot; print -- the rest of line is ignored
+-- this line is also ignored
+</pre></div>
+</div>
+<p>Stream comment:</p>
+<div class="highlight-python"><div class="highlight"><pre>4 10 mul (this is a comment) 1 1 add add ( this also )
+</pre></div>
+</div>
+<p>Conditional statement:</p>
+<div class="highlight-python"><div class="highlight"><pre>if 10 equal then &quot;equals ten&quot; print end
+</pre></div>
+</div>
+<p>Conditional statement with alternative:</p>
+<div class="highlight-python"><div class="highlight"><pre>if 10 less not then &quot;ten or more&quot; else &quot;nine or less&quot; end
+</pre></div>
+</div>
+<p>Counted loop:</p>
+<div class="highlight-python"><div class="highlight"><pre>3 times
+    &quot;Hastur! &quot; print
+loop
+</pre></div>
+</div>
+<p>Universal loop:</p>
+<div class="highlight-python"><div class="highlight"><pre>do
+    scan-for-enemies
+    if enemy then
+        break end
+    patrol-area
+loop
+exterminate exterminate exterminate
+</pre></div>
+</div>
+<p>New function definition:</p>
+<div class="highlight-python"><div class="highlight"><pre>def square dup mul ret
+</pre></div>
+</div>
+<p>New function definition with named parameters:</p>
+<div class="highlight-python"><div class="highlight"><pre>def energy of h m v as
+    m v v mul mul 2 div -- kinetic energy
+    h m g mul mul -- potential energy
+    add ret
+</pre></div>
+</div>
+<p>Testing:</p>
+<div class="highlight-python"><div class="highlight"><pre>test 40 2 add 42 ok
+test 10 dup inc 11 ok 10 ok
+</pre></div>
+</div>
+<p>Lambda expressions:</p>
+<div class="highlight-python"><div class="highlight"><pre>[&quot; world&quot; print] [ &quot;hello&quot; print ] call call -- prints &quot;hello world&quot;
+</pre></div>
+</div>
+<p>Recurrency:</p>
+<div class="highlight-python"><div class="highlight"><pre>def print-stack
+    if depth then dot drop print-stack end ret
+</pre></div>
+</div>
+<p>List reduction:</p>
+<div class="highlight-python"><div class="highlight"><pre>[1 3 5 7 9] list [add] fold -- sum all elements
+</pre></div>
+</div>
+<p>Include module:</p>
+<div class="highlight-python"><div class="highlight"><pre>use string
+do each-word
+    print
+loop
+</pre></div>
+</div>
+</div>
+<div class="section" id="functions">
+<h2>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="stack-manipulation">
+<h3>Stack Manipulation<a class="headerlink" href="#stack-manipulation" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="13%" />
+<col width="71%" />
+<col width="6%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">name</th>
+<th class="head">effect</th>
+<th class="head">comments</th>
+<th class="head">core</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>swap</td>
+<td>(ab&#8211;ba)</td>
+<td>swap the two top stack items</td>
+<td>yes</td>
+</tr>
+<tr class="row-odd"><td>dup</td>
+<td>(a&#8211;aa)</td>
+<td>duplicate the top stack item</td>
+<td>yes</td>
+</tr>
+<tr class="row-even"><td>drop</td>
+<td>(a&#8211;)</td>
+<td>discard the top item</td>
+<td>yes</td>
+</tr>
+<tr class="row-odd"><td>over</td>
+<td>(ab&#8211;aba)</td>
+<td>push the second item on top</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>nip</td>
+<td>(ab&#8211;b)</td>
+<td>discard the second item</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>tuck</td>
+<td>(ab&#8211;bab)</td>
+<td>insert copy of top item before second item</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>rot</td>
+<td>(abc&#8211;bca)</td>
+<td>rotate the third item to the top</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>unrot</td>
+<td>(abc&#8211;cab)</td>
+<td>unrotate the top to the third item</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>depth</td>
+<td>(&#8211;n)</td>
+<td>push number of items on stack</td>
+<td>yes</td>
+</tr>
+<tr class="row-odd"><td>tor</td>
+<td>(a&#8211;)(=a)</td>
+<td>move the top item to the return stack</td>
+<td>yes</td>
+</tr>
+<tr class="row-even"><td>tos</td>
+<td>(&#8211;x)(a=)</td>
+<td>move the top item of return stack to stack</td>
+<td>yes</td>
+</tr>
+<tr class="row-odd"><td>mark</td>
+<td>(&#8211;)(=n)</td>
+<td>mark stack location (push stack depth to return stack)</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>count</td>
+<td>(&#8211;x)(n=)</td>
+<td>push number of items after the mark, unmark stack</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>yank</td>
+<td>(&#8211;a)(ab=b)</td>
+<td>remove second item from return stack and place it on stack</td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="basic-arithmetic">
+<h3>Basic Arithmetic<a class="headerlink" href="#basic-arithmetic" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="12%" />
+<col width="72%" />
+<col width="6%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">name</th>
+<th class="head">effect</th>
+<th class="head">comments</th>
+<th class="head">core</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>add</td>
+<td>(ab&#8211;x)</td>
+<td>add two top items (a+b)</td>
+<td>yes</td>
+</tr>
+<tr class="row-odd"><td>sub</td>
+<td>(ab&#8211;x)</td>
+<td>subtract top item from second item (a-b)</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>mul</td>
+<td>(ab&#8211;x)</td>
+<td>multiply two top items (a*b)</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>div</td>
+<td>(ab&#8211;x)</td>
+<td>divide second item by top item (a/b)</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>mod</td>
+<td>(ab&#8211;x)</td>
+<td>reminder of dividing second item by top item (a%b)</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>inc</td>
+<td>(a&#8211;x)</td>
+<td>increment the top item (a+1)</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>dec</td>
+<td>(a&#8211;x)</td>
+<td>decrement the top item (a-1)</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>abs</td>
+<td>(a&#8211;x)</td>
+<td>return absolute value (abs(a))</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>neg</td>
+<td>(a&#8211;x)</td>
+<td>change the sign (-a)</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="comparators">
+<h3>Comparators<a class="headerlink" href="#comparators" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="13%" />
+<col width="71%" />
+<col width="6%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">name</th>
+<th class="head">effect</th>
+<th class="head">comments</th>
+<th class="head">core</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>zero</td>
+<td>(a&#8211;ax)</td>
+<td>check if a == 0</td>
+<td>yes</td>
+</tr>
+<tr class="row-odd"><td>minus</td>
+<td>(a&#8211;ax)</td>
+<td>check if a &lt; 0</td>
+<td>yes</td>
+</tr>
+<tr class="row-even"><td>plus</td>
+<td>(a&#8211;ax)</td>
+<td>check if a &gt; 0</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>less</td>
+<td>(ab&#8211;ax)</td>
+<td>check if a &lt; b</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>more</td>
+<td>(ab&#8211;ax)</td>
+<td>check if a &gt; b</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>equal</td>
+<td>(ab&#8211;ax)</td>
+<td>check if a == b</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>within</td>
+<td>(nab&#8211;nx)</td>
+<td>check if a &lt;= n &lt;= b</td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="logic">
+<h3>Logic<a class="headerlink" href="#logic" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="8%" />
+<col width="13%" />
+<col width="72%" />
+<col width="8%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">name</th>
+<th class="head">effect</th>
+<th class="head">comments</th>
+<th class="head">core</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>and</td>
+<td>(ab&#8211;x)</td>
+<td>and two top items (a&amp;b)</td>
+<td>yes</td>
+</tr>
+<tr class="row-odd"><td>or</td>
+<td>(ab&#8211;x)</td>
+<td>or two top items (a|b)</td>
+<td>yes</td>
+</tr>
+<tr class="row-even"><td>xor</td>
+<td>(ab&#8211;x)</td>
+<td>xor two top items (a^b)</td>
+<td>?</td>
+</tr>
+<tr class="row-odd"><td>shl</td>
+<td>(ab&#8211;x)</td>
+<td>shift a left by b bits (a&lt;&lt;b)</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>shr</td>
+<td>(ab&#8211;x)</td>
+<td>shift a right by b bits (a&gt;&gt;b)</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>ushr</td>
+<td>(ab&#8211;x)</td>
+<td>shift unsigned a right by b bits (a&gt;&gt;b)</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>inv</td>
+<td>(a&#8211;x)</td>
+<td>invert all bits (~a)</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>not</td>
+<td>(a&#8211;x)</td>
+<td>logical negation (!a)</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="input-output">
+<h3>Input/Output<a class="headerlink" href="#input-output" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="8%" />
+<col width="10%" />
+<col width="76%" />
+<col width="6%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">name</th>
+<th class="head">effect</th>
+<th class="head">comments</th>
+<th class="head">core</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>emit</td>
+<td>(c&#8211;)</td>
+<td>write single character to standard output</td>
+<td>yes</td>
+</tr>
+<tr class="row-odd"><td>take</td>
+<td>(&#8211;c)</td>
+<td>read single character from standard input</td>
+<td>opt.</td>
+</tr>
+<tr class="row-even"><td>untake</td>
+<td>(c&#8211;)</td>
+<td>unread single character from standard input</td>
+<td>opt.</td>
+</tr>
+<tr class="row-odd"><td>print</td>
+<td>(an&#8211;)</td>
+<td>prints n characters at address a</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>argc</td>
+<td>(&#8211;x)</td>
+<td>returns number of program arguments</td>
+<td>opt.</td>
+</tr>
+<tr class="row-odd"><td>argv</td>
+<td>(a&#8211;xn)</td>
+<td>returns address and length of argument number a</td>
+<td>opt.</td>
+</tr>
+<tr class="row-even"><td>dot</td>
+<td>(a&#8211;a)</td>
+<td>prints top item as number followed by space</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>udot</td>
+<td>(a&#8211;a)</td>
+<td>prints top item as unsigned number followed by space</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>xdot</td>
+<td>(a&#8211;a)</td>
+<td>prints top item as hexadecimal number followed by a space</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>write</td>
+<td>(anf&#8211;)</td>
+<td>write n characters at address a to file with descriptor f</td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="control-flow">
+<h3>Control Flow<a class="headerlink" href="#control-flow" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="8%" />
+<col width="10%" />
+<col width="76%" />
+<col width="6%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">name</th>
+<th class="head">effect</th>
+<th class="head">comments</th>
+<th class="head">core</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>def X</td>
+<td>(&#8211;)</td>
+<td>define new word X</td>
+<td>yes</td>
+</tr>
+<tr class="row-odd"><td>ret</td>
+<td>(&#8211;)</td>
+<td>return from definition</td>
+<td>yes</td>
+</tr>
+<tr class="row-even"><td>macro X</td>
+<td>(&#8211;)</td>
+<td>define new macro X</td>
+<td>yes</td>
+</tr>
+<tr class="row-odd"><td>inline</td>
+<td>(&#8211;)</td>
+<td>end macro definition</td>
+<td>yes</td>
+</tr>
+<tr class="row-even"><td>then</td>
+<td>(x&#8211;)</td>
+<td>execute following code if x is not zero</td>
+<td>yes</td>
+</tr>
+<tr class="row-odd"><td>else</td>
+<td>(&#8211;)</td>
+<td>alternative code for the then word (optional)</td>
+<td>yes</td>
+</tr>
+<tr class="row-even"><td>end</td>
+<td>(&#8211;)</td>
+<td>finish then/else sequence</td>
+<td>yes</td>
+</tr>
+<tr class="row-odd"><td>do</td>
+<td>(&#8211;x)</td>
+<td>start of unconditioned loop</td>
+<td>yes</td>
+</tr>
+<tr class="row-even"><td>break</td>
+<td>(x&#8211;)</td>
+<td>break out of the current loop</td>
+<td>yes</td>
+</tr>
+<tr class="row-odd"><td>loop</td>
+<td>(&#8211;)</td>
+<td>repeat loop</td>
+<td>yes</td>
+</tr>
+<tr class="row-even"><td>times</td>
+<td>(x&#8211;)</td>
+<td>start of counted loop</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>&#8220;X&#8221;</td>
+<td>(&#8211;an)</td>
+<td>start/end of a string, places addres and length on the stack</td>
+<td>yes</td>
+</tr>
+<tr class="row-even"><td>[</td>
+<td>(&#8211;)</td>
+<td>start of anonymous code block</td>
+<td>yes</td>
+</tr>
+<tr class="row-odd"><td>]</td>
+<td>(&#8211;f)</td>
+<td>end of anonymous code block</td>
+<td>yes</td>
+</tr>
+<tr class="row-even"><td>call</td>
+<td>(f&#8211;)</td>
+<td>call code block referenced by f</td>
+<td>yes</td>
+</tr>
+<tr class="row-odd"><td>&#8216;X&#8217;</td>
+<td>(&#8211;c)</td>
+<td>start/end of a char</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>X</td>
+<td>(&#8211;x)</td>
+<td>place integer X in the stack</td>
+<td>yes</td>
+</tr>
+<tr class="row-odd"><td>use X</td>
+<td>(&#8211;)</td>
+<td>use module X</td>
+<td>yes</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="other">
+<h3>Other<a class="headerlink" href="#other" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="8%" />
+<col width="10%" />
+<col width="76%" />
+<col width="6%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">name</th>
+<th class="head">effect</th>
+<th class="head">comments</th>
+<th class="head">core</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>nop</td>
+<td>(&#8211;)</td>
+<td>do nothig</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>clock</td>
+<td>(&#8211;x)</td>
+<td>returns number of microseconds since the program was launched</td>
+<td>opt.</td>
+</tr>
+<tr class="row-even"><td>halt</td>
+<td>(&#8211;)</td>
+<td>stops program execution</td>
+<td>yes</td>
+</tr>
+<tr class="row-odd"><td>peek</td>
+<td>(a&#8211;c)</td>
+<td>get character (unsigned) from address a</td>
+<td>opt.</td>
+</tr>
+<tr class="row-even"><td>poke</td>
+<td>(ca&#8211;)</td>
+<td>set character at addres a to c</td>
+<td>opt.</td>
+</tr>
+<tr class="row-odd"><td>ok</td>
+<td>(ab&#8211;)</td>
+<td>halt and print error if two top items are not equal</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>trace</td>
+<td>(&#8211;)</td>
+<td>prints information about VM state - stack, ip, ...</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>sprint</td>
+<td>(&#8211;)</td>
+<td>prints stack</td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="string-manipulation">
+<h3>String Manipulation<a class="headerlink" href="#string-manipulation" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="11%" />
+<col width="14%" />
+<col width="69%" />
+<col width="6%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">name</th>
+<th class="head">effect</th>
+<th class="head">comments</th>
+<th class="head">core</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>hash</td>
+<td>(an&#8211;x)</td>
+<td>return hash value for given string (x65599 algorithm)</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>split</td>
+<td>(an&#8211;rxfy)</td>
+<td>return first word from a string and the rest of the string</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>strip</td>
+<td>(an&#8211;bx)</td>
+<td>return string without leading and trailing whitespaces</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>lstrip</td>
+<td>(an&#8211;bx)</td>
+<td>return string without leading whitespaces</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>rstrip</td>
+<td>(an&#8211;bx)</td>
+<td>return string without trailing whitespaces</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>substr</td>
+<td>(ankc&#8211;anbc)</td>
+<td>return substring of c characters starting at b</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-even"><td>index</td>
+<td>(anbm&#8211;anx)</td>
+<td>return index of bm string within an string, or -1</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>char</td>
+<td>(ani&#8211;anx)</td>
+<td>return character at index i in given string</td>
+<td>yes</td>
+</tr>
+<tr class="row-even"><td>upper</td>
+<td>(an&#8211;an)</td>
+<td>destructive change to lowercase</td>
+<td>&nbsp;</td>
+</tr>
+<tr class="row-odd"><td>lower</td>
+<td>(an&#8211;an)</td>
+<td>destructive change to uppercase</td>
+<td>&nbsp;</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="string-comparators">
+<h3>String Comparators<a class="headerlink" href="#string-comparators" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="14%" />
+<col width="76%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">name</th>
+<th class="head">effect</th>
+<th class="head">comments</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>begins</td>
+<td>(anbm&#8211;anx)</td>
+<td>return true if an string begins with bm string</td>
+</tr>
+<tr class="row-odd"><td>ends</td>
+<td>(anbm&#8211;anx)</td>
+<td>return true if an string ends with bm string</td>
+</tr>
+<tr class="row-even"><td>contains</td>
+<td>(anbm&#8211;anx)</td>
+<td>return true if an string contains bm string</td>
+</tr>
+<tr class="row-odd"><td>arein</td>
+<td>(anbm&#8211;anx)</td>
+<td>return true if an string contains any character from bm string</td>
+</tr>
+<tr class="row-even"><td>haschar</td>
+<td>(anc&#8211;anx)</td>
+<td>return true if an string contains character c</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="more-stack-manipulation">
+<h3>More Stack Manipulation<a class="headerlink" href="#more-stack-manipulation" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="10%" />
+<col width="15%" />
+<col width="75%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">name</th>
+<th class="head">effect</th>
+<th class="head">comments</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>dup2</td>
+<td>(ab&#8211;abab)</td>
+<td>duplicate top pair</td>
+</tr>
+<tr class="row-odd"><td>swap2</td>
+<td>(abxy&#8211;xyab)</td>
+<td>swap two pairs</td>
+</tr>
+<tr class="row-even"><td>drop2</td>
+<td>(ab&#8211;)</td>
+<td>drop pair</td>
+</tr>
+<tr class="row-odd"><td>pick</td>
+<td>(n&#8211;x)</td>
+<td>pick nth stack item from top (not counting n)</td>
+</tr>
+<tr class="row-even"><td>ndrop</td>
+<td>(?n&#8211;?)</td>
+<td>discard n top items (not counting n)</td>
+</tr>
+<tr class="row-odd"><td>reverse</td>
+<td>(?n&#8211;?n)</td>
+<td>reverse order of n top stack items</td>
+</tr>
+<tr class="row-even"><td>reverse2</td>
+<td>(?n&#8211;?n)</td>
+<td>reverse order of n top stack pairs</td>
+</tr>
+<tr class="row-odd"><td>push</td>
+<td>(?n&#8211;)</td>
+<td>push n items from stack to return stack</td>
+</tr>
+<tr class="row-even"><td>revpush</td>
+<td>(?n&#8211;)</td>
+<td>push n items from stack to return stack in reverse order</td>
+</tr>
+<tr class="row-odd"><td>pop</td>
+<td>(n&#8211;?)</td>
+<td>pop n items from return stack onto stack</td>
+</tr>
+<tr class="row-even"><td>revpop</td>
+<td>(n&#8211;?)</td>
+<td>pop n items from return stack onto stack in reverse order</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+<div class="section" id="more-arithmetic">
+<h3>More Arithmetic<a class="headerlink" href="#more-arithmetic" title="Permalink to this headline">¶</a></h3>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="12%" />
+<col width="12%" />
+<col width="77%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">name</th>
+<th class="head">effect</th>
+<th class="head">comments</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>min</td>
+<td>(ab&#8211;x)</td>
+<td>return lower value</td>
+</tr>
+<tr class="row-odd"><td>max</td>
+<td>(ab&#8211;x)</td>
+<td>return greater value</td>
+</tr>
+<tr class="row-even"><td>limit</td>
+<td>(xab&#8211;y)</td>
+<td>limit value of x (aka clamp), if x&lt;a then a, if x&gt;b then b</td>
+</tr>
+<tr class="row-odd"><td>divmul</td>
+<td>(abc&#8211;x)</td>
+<td>... (a/b*c)</td>
+</tr>
+<tr class="row-even"><td>muldiv</td>
+<td>(abc&#8211;x)</td>
+<td>... (a*b/c)</td>
+</tr>
+<tr class="row-odd"><td>muldivmod</td>
+<td>(abc&#8211;xr)</td>
+<td>... (a*b/c, a*b%c)</td>
+</tr>
+<tr class="row-even"><td>divmod</td>
+<td>(ab&#8211;xr)</td>
+<td>... (a/b, a%b)</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+</div>
+</div>
+<div class="section" id="performance">
+<h2>Performance<a class="headerlink" href="#performance" title="Permalink to this headline">¶</a></h2>
+<p id="fast">Different dispatching techniques results in different efficiency depending
+on the CPU architecture <a class="footnote-reference" href="#id2" id="id1">[1]</a>.</p>
+<p>Fabris offers multiple dispatching strategies in the single VM.</p>
+<blockquote>
+<div><table border="1" class="docutils">
+<colgroup>
+<col width="17%" />
+<col width="3%" />
+<col width="6%" />
+<col width="9%" />
+<col width="6%" />
+<col width="9%" />
+<col width="10%" />
+<col width="9%" />
+<col width="7%" />
+<col width="9%" />
+<col width="7%" />
+<col width="9%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">benchmark</th>
+<th class="head">N</th>
+<th class="head">goto</th>
+<th class="head">switch</th>
+<th class="head">call</th>
+<th class="head">direct</th>
+<th class="head">repl.sw</th>
+<th class="head">c.call</th>
+<th class="head">c.inl</th>
+<th class="head">python</th>
+<th class="head">ENV</th>
+<th class="head">VM cfg</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>nested-loops</td>
+<td>16</td>
+<td>508</td>
+<td>862</td>
+<td>990</td>
+<td>391</td>
+<td>518</td>
+<td>489</td>
+<td>464</td>
+<td>11671</td>
+<td>E.1</td>
+<td>C.0</td>
+</tr>
+<tr class="row-odd"><td>nested-loops</td>
+<td>16</td>
+<td>398</td>
+<td>882</td>
+<td>934</td>
+<td>287</td>
+<td>546</td>
+<td>400</td>
+<td>369</td>
+<td>7142</td>
+<td>E.1</td>
+<td>C.1</td>
+</tr>
+<tr class="row-even"><td>fibonacci</td>
+<td>32</td>
+<td>867</td>
+<td>1043</td>
+<td>1183</td>
+<td>665</td>
+<td>904</td>
+<td>520</td>
+<td>485</td>
+<td>6037</td>
+<td>E.1</td>
+<td>C.0</td>
+</tr>
+<tr class="row-odd"><td>fibonacci</td>
+<td>32</td>
+<td>620</td>
+<td>1017</td>
+<td>1001</td>
+<td>501</td>
+<td>787</td>
+<td>506</td>
+<td>401</td>
+<td>4524</td>
+<td>E.1</td>
+<td>C.2</td>
+</tr>
+</tbody>
+</table>
+</div></blockquote>
+<p>Programs are based on Benchmark Tests from <a class="reference external" href="http://dada.perl.it/shootout/">http://dada.perl.it/shootout/</a>.</p>
+<p>Times are given in milliseconds for best of 5 runs. More benchmarks and results coming soon.</p>
+<dl class="docutils">
+<dt>Environment:</dt>
+<dd><ul class="first last simple">
+<li>E.1 - Intel Atom N570 1.66 &#64; 1.0 GHz, gcc 4.8.4, -O3 -fomit-frame-pointer</li>
+</ul>
+</dd>
+<dt>VM config:</dt>
+<dd><ul class="first last simple">
+<li>C.0 - Default Fabris config. Python 3.5</li>
+<li>C.1 - Fabris registers: sp on ESI, ip on EDI. Python 2.7</li>
+<li>C.2 - Fabris registers: sp on ESI, ip on EDI, rp on EBX. Python 2.7</li>
+</ul>
+</dd>
+</dl>
+<p>Related articles:</p>
+<table class="docutils footnote" frame="void" id="id2" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td><a class="reference external" href="http://www.complang.tuwien.ac.at/forth/threading/">http://www.complang.tuwien.ac.at/forth/threading/</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id3" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[2]</td><td><a class="reference external" href="http://www.complang.tuwien.ac.at/forth/threaded-code.html">http://www.complang.tuwien.ac.at/forth/threaded-code.html</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id4" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[3]</td><td><a class="reference external" href="http://realityforge.org/code/virtual-machines/2011/05/19/interpreters.html">http://realityforge.org/code/virtual-machines/2011/05/19/interpreters.html</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id5" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[4]</td><td><a class="reference external" href="https://en.wikipedia.org/wiki/Threaded_code">https://en.wikipedia.org/wiki/Threaded_code</a></td></tr>
+</tbody>
+</table>
+</div>
+<div class="section" id="minimalism">
+<h2>Minimalism<a class="headerlink" href="#minimalism" title="Permalink to this headline">¶</a></h2>
+<p id="compact">One of the design goals of Fabris is to be compact. That is why the language is divided
+into core words and extension words. Fabris implementation needs only to natively handle
+core words to provide ability to compile any Fabris program as every extension word
+can be writen in Fabris using only core words. In practice most standard Fabris words
+are natively implemented because they are designed to be easily implemented in C.</p>
+<dl class="docutils">
+<dt>Fabris core words:</dt>
+<dd><ul class="first last simple">
+<li>12 control flow words: def, ret, then, else, end, [, ], call, &#8221;, do, break, loop</li>
+<li>6 stack manipulation words: swap, dup, drop, tos, tor, depth</li>
+<li>7 arithmetic and logic words: add, neg, zero, minus, and, or, not</li>
+<li>3 other words: emit, char, halt</li>
+<li>4 optional words: clock, take, argc, argv</li>
+</ul>
+</dd>
+</dl>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">FABRIS PROGRAMMING LANGUAGE</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#basic-syntax">Basic Syntax</a></li>
+<li><a class="reference internal" href="#functions">Functions</a><ul>
+<li><a class="reference internal" href="#stack-manipulation">Stack Manipulation</a></li>
+<li><a class="reference internal" href="#basic-arithmetic">Basic Arithmetic</a></li>
+<li><a class="reference internal" href="#comparators">Comparators</a></li>
+<li><a class="reference internal" href="#logic">Logic</a></li>
+<li><a class="reference internal" href="#input-output">Input/Output</a></li>
+<li><a class="reference internal" href="#control-flow">Control Flow</a></li>
+<li><a class="reference internal" href="#other">Other</a></li>
+<li><a class="reference internal" href="#string-manipulation">String Manipulation</a></li>
+<li><a class="reference internal" href="#string-comparators">String Comparators</a></li>
+<li><a class="reference internal" href="#more-stack-manipulation">More Stack Manipulation</a></li>
+<li><a class="reference internal" href="#more-arithmetic">More Arithmetic</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#performance">Performance</a></li>
+<li><a class="reference internal" href="#minimalism">Minimalism</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/readme.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="#" title="General Index"
+             >index</a></li>
+        <li class="nav-item nav-item-0"><a href="#">Fabris  documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright .
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.5.
+    </div>
+  </body>
+</html>
