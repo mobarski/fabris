@@ -1,0 +1,4 @@
+
+macro each-word
+	split if minus then drop4 break end
+	inline

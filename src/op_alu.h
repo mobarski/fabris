@@ -89,6 +89,10 @@
 		sp[0] = ~sp[0];
 		NEXT;
 	
+	op_not:
+		sp[0] = sp[0] ? 0 : 1 ;
+		NEXT;
+	
 // === COMPARATORS ========
 	
 	op_zero:

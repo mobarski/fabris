@@ -1,26 +1,11 @@
 source = """
 
 use string
-
-"this is a test"
+"aaa   "
 do each-word
-    '>' emit
-    print
-    '<' emit
-    "\n" print
+	print '-' emit
 loop
 
-"""
-
-source = """
-1
-do
-	2
-	break
-	3
-loop
-4
-sprint
 """
 
 ##############################################

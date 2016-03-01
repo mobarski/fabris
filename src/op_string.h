@@ -99,6 +99,10 @@
 		sp[2] = j;
 		sp[-1] = sp[-1]+j;
 		sp[0] -= j;
+		if (sp[0]<=0 && sp[2]<=0) { // empty string
+			sp[2] = -1;
+			sp[0] = -1;
+		}
 		sp += 2;
 		NEXT;
 

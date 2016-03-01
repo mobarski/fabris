@@ -31,7 +31,8 @@
 		NEXT;
 		
 	op_print:
-		write(1, (char*)sp[-1], sp[0]);
+		//write(1, (char*)sp[-1], sp[0]);
+		for (i=0;i<sp[0];i++) putchar(((char*)(sp[-1]))[i]);
 		sp-=2;
 		NEXT;
 		
