@@ -1,10 +1,20 @@
 source = """
 
-use string
-"aaa   "
-do each-word
-	print '-' emit
-loop
+(
+macro list
+	macro { mark 1 2 inline
+	macro | 3 4 inline
+	macro } 5 6 count inline
+	inline
+
+list { | | } sprint
+)
+
+macro chain
+	macro . 1 macro . 2 macro . 3 inline inline inline
+	inline
+
+chain . . . sprint
 
 """
 
@@ -88,7 +98,7 @@ def tokenize(text):
 	|	" [^"]* "
 	|	' [^']* '
 	|	\[ | \]
-	|	[a-z0-9+-]+
+	|	[^\s]+
 	"""
 	tokens = re.findall(regexp,text)
 	return tokens
@@ -111,15 +121,19 @@ use_mod = False
 curr_def = ''
 curr_macro = ''
 out_tokens = []
+macro_depth = 0
 
 
 while tokens:
 	t = tokens.pop(0)
-
-	if curr_macro:
-		if t=='inline':
-			curr_macro = ''
+	
+	#print('token',t,'depth',macro_depth)
+	if macro_depth:
+		if t=='inline' and macro_depth==1:
+			macro_depth = 0
 		else:
+			if t=='macro': macro_depth+=1
+			if t=='inline': macro_depth-=1
 			macro[curr_macro] += [t]
 		continue
 
@@ -161,6 +175,7 @@ while tokens:
 	elif def_macro:
 		macro[t] = []
 		curr_macro = t
+		macro_depth = 1
 		def_macro = False
 	
 	if t[0]=='(':
@@ -287,6 +302,7 @@ while tokens:
 print(out_tokens)
 print(code)
 print(ctrl)
+print(macro)
 
 #############################################
 #############################################
