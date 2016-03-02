@@ -111,6 +111,11 @@
 		rp += 1;
 		sp += 1;
 		NEXT;
+	
+	op_cut:
+		sp = sbase+(int)rp[0];
+		rp += 1;
+		NEXT;
 		
 	op_push:
 		for (i=0;i<sp[0];i++) {

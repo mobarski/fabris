@@ -1,20 +1,6 @@
 source = """
 
-(
-macro list
-	macro { mark 1 2 inline
-	macro | 3 4 inline
-	macro } 5 6 count inline
-	inline
-
-list { | | } sprint
-)
-
-macro chain
-	macro . 1 macro . 2 macro . 3 inline inline inline
-	inline
-
-chain . . . sprint
+9 8 mark 7 6 5 4 cut 3 2 1 sprint
 
 """
 

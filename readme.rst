@@ -133,7 +133,8 @@ Stack Manipulation
   tor      (a--)(=a)   move the top item to the return stack                        yes 
   tos      (--x)(a=)   move the top item of return stack to stack                   yes 
   mark     (--)(=n)    mark stack location (push stack depth to return stack)           
-  count    (--x)(n=)   push number of items after the mark, unmark stack                
+  count    (--x)(n=)   push number of items after the mark, unmark stack
+  cut      (?--)(n=)   drop items after marked stack location  
   yank     (--a)(ab=b) remove second item from return stack and place it on stack       
   ======== =========== ============================================================ =====
 
