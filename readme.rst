@@ -48,6 +48,12 @@ Conditional statement with alternative::
 
     if 10 less not then "ten or more" else "nine or less" end
 
+Conditional statement with multiple branches::
+
+    if 10 less not then "ten or more" else
+        8 less not then "eight or nine" else
+			"seven or less" end
+
 Counted loop::
 
     3 times
@@ -217,7 +223,7 @@ Control Flow
   macro X (--)     define new macro X                                               yes
   inline  (--)     end macro definition                                             yes
   then    (x--)    execute following code if x is not zero                          yes
-  else    (--)     alternative code for the then word (optional)                    yes
+  else    (--)     branch for the then word (optional)                              yes
   end     (--)     finish then/else sequence                                        yes
   do      (--x)    start of unconditioned loop                                      yes
   break   (x--)    break out of the current loop                                    yes

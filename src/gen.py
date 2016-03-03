@@ -1,6 +1,17 @@
 source = """
 
-9 8 mark 7 6 5 4 cut 3 2 1 sprint
+4 2
+
+1 equal then '1'
+else
+2 equal then '2'
+	4 equal then 'a' else 'b' end emit
+else
+3 equal then '3' else '?' end
+emit
+
+1 then 'a' else 'b' end emit
+1 then 'a' emit end
 
 """
 
@@ -226,13 +237,18 @@ while tokens:
 		code += [opcode['skip']]
 		here = len(code)
 		kind,there = ctrl.pop(-1)
-		code[there+1] = here-there + 3
+		code[there] = here-there + 2
+		#ctrl += [(kind,there)]
 		ctrl += [('else',len(code))]
 		code += [0]
 	elif t=='end':
 		here = len(code)
 		kind,there = ctrl.pop(-1)
 		code[there] = here-there + 1
+		if kind=='else':
+			while ctrl and ctrl[-1][0]=='else':
+				kind,there = ctrl.pop(-1)
+				code[there] = here-there + 1
 	elif t=='var':
 		code += [opcode['var']]
 		def_var = True
