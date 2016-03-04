@@ -83,7 +83,7 @@
 		JUMP;
 		
 	op_lambda: //ARG 12
-		sp[1] = (uint)&ip[2];
+		sp[1] = (uint)(&ip[2]-ibase);
 		sp += 1;
 		ip += ip[1];
 		JUMP;
@@ -106,7 +106,7 @@
 		
 	op_call:
 		rp[-1] = ip+1;
-		ip = (token*)sp[0];
+		ip = (token*)(sp[0]+ibase);
 		rp -= 1;
 		sp -= 1;
 		JUMP;

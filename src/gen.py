@@ -1,11 +1,7 @@
 source = """
 
-def x y y add ret
-def y z z add ret
-def z 4 ret
-def z 1 ret
-
-x dot
+def a 42 ret
+ref a call dot
 
 """
 
@@ -114,6 +110,10 @@ curr_macro = ''
 out_tokens = []
 macro_depth = 0
 undefined = {}# name -> [pos,pos,...]
+dynamic = set()
+def_dyn = False
+as_word = False
+ref_word = False
 
 
 while tokens:
@@ -148,7 +148,10 @@ while tokens:
 		def_var = False
 		continue
 	elif def_word:
-		word[t] = len(code)
+		if t in dynamic:
+			code[word[t]+1] = len(code)
+		else:
+			word[t] = len(code)
 		curr_def = t
 		def_word = False
 		if t in undefined:
@@ -173,6 +176,24 @@ while tokens:
 		curr_macro = t
 		macro_depth = 1
 		def_macro = False
+		continue
+	elif def_dyn:
+		dynamic.add(t)
+		word[t] = len(code)
+		code += [opcode['tailcallx']]
+		code += [0]
+		def_dyn = False
+		continue
+	elif as_word:
+		code += [opcode['into']]
+		code += [word[t]+1]
+		as_word = False
+		continue
+	elif ref_word:
+		code += [opcode['pushx']]
+		code += [word[t]]
+		ref_word = False
+		continue
 	
 	if t[0]=='(':
 		continue
@@ -254,6 +275,10 @@ while tokens:
 	elif t=='into':
 		code += [opcode['into']]
 		into_var = True
+	elif t=='dyn':
+		code += [opcode['skip']]
+		code += [4]
+		def_dyn = True
 	elif t=='def':
 		code += [opcode['skip']]
 		ctrl += [('def',len(code))]
@@ -279,6 +304,10 @@ while tokens:
 		here = len(code)
 		kind,there = ctrl.pop(-1)
 		code[there] = here-there + 1
+	elif t=='as':
+		as_word = True
+	elif t=='ref':
+		ref_word = True
 	elif t in ['test','if']:
 		continue
 	elif t=='use':

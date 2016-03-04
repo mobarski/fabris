@@ -5,8 +5,8 @@
 
 // === CONFIG =========================================
 
-#define OTHER_RUN_FUNCTIONS	1
-#define USE_REGISTERS			0
+#define OTHER_RUN_FUNCTIONS	0
+#define USE_REGISTERS			1
 #define REPL_SWITCH			0
 
 // === CORE ===========================================
