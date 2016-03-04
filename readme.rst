@@ -124,6 +124,11 @@ Functions
 Stack Manipulation
 ------------------
 
+..	TODO
+	r -> kopiuje gorny element r do s
+	rdrop -> odrzuca element z r
+	? jakies inne nazwy na operacje na r
+
   ======== =========== ============================================================ =====
   name     effect      comments                                                     core 
   ======== =========== ============================================================ =====
@@ -221,19 +226,19 @@ Control Flow
   def X   (--)     define new word X                                                yes
   ret     (--)     return from definition                                           yes
   macro X (--)     define new macro X                                               yes
-  inline  (--)     end macro definition                                             yes
+  mend    (--)     end macro definition                                             yes
   then    (x--)    execute following code if x is not zero                          yes
   else    (--)     branch for the then word (optional)                              yes
   end     (--)     finish then/else sequence                                        yes
   do      (--x)    start of unconditioned loop                                      yes
   break   (x--)    break out of the current loop                                    yes
   loop    (--)     repeat loop                                                      yes
-  times   (x--)    start of counted loop
+  times   (x--)    start of counted loop                                            yes
   "X"     (--an)   start/end of a string, places addres and length on the stack     yes
   [       (--)     start of anonymous code block                                    yes
   ]       (--f)    end of anonymous code block                                      yes
   call    (f--)    call code block referenced by f                                  yes
-  'X'     (--c)    start/end of a char
+  'X'     (--c)    start/end of a char                                              yes
   X       (--x)    place integer X in the stack                                     yes
   use X   (--)     use module X                                                     yes
   ======= ======== ================================================================ =====

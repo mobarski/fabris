@@ -1,17 +1,11 @@
 source = """
 
-4 2
+def x y y add ret
+def y z z add ret
+def z 4 ret
+def z 1 ret
 
-1 equal then '1'
-else
-2 equal then '2'
-	4 equal then 'a' else 'b' end emit
-else
-3 equal then '3' else '?' end
-emit
-
-1 then 'a' else 'b' end emit
-1 then 'a' emit end
+x dot
 
 """
 
@@ -119,6 +113,7 @@ curr_def = ''
 curr_macro = ''
 out_tokens = []
 macro_depth = 0
+undefined = {}# name -> [pos,pos,...]
 
 
 while tokens:
@@ -126,11 +121,11 @@ while tokens:
 	
 	#print('token',t,'depth',macro_depth)
 	if macro_depth:
-		if t=='inline' and macro_depth==1:
+		if t=='mend' and macro_depth==1:
 			macro_depth = 0
 		else:
 			if t=='macro': macro_depth+=1
-			if t=='inline': macro_depth-=1
+			if t=='mend': macro_depth-=1
 			macro[curr_macro] += [t]
 		continue
 
@@ -156,6 +151,10 @@ while tokens:
 		word[t] = len(code)
 		curr_def = t
 		def_word = False
+		if t in undefined:
+			for pos in undefined[t]:
+				code[pos] = word[t]
+			del undefined[t]
 		continue
 	elif into_var:
 		code += [var[t]]
@@ -299,12 +298,18 @@ while tokens:
 	elif t in word:
 		code += [opcode['callx']]
 		code += [word[t]]
-	else:
+	elif t in opcode:
 		code += [opcode[t]]
+	else:
+		code += [opcode['callx']]
+		if t not in undefined: undefined[t] = []
+		undefined[t] += [len(code)]
+		code += [0]
 print(out_tokens)
 print(code)
 print(ctrl)
 print(macro)
+print(undefined)
 
 #############################################
 #############################################
