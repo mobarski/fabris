@@ -7,7 +7,7 @@ Introduction
 ============
 
 Fabris is a `stack-oriented`_, `concatenative`_ language designed to be compact_,
-fast_ and beginner friendly.
+simple_ and efficient_. Fabris is inspired by Forth, Joy, DSSP, Python and Unix.
 
 .. _stack-oriented: https://en.wikipedia.org/wiki/Stack-oriented_programming_language
 .. _concatenative: https://en.wikipedia.org/wiki/Concatenative_programming_language
@@ -20,9 +20,6 @@ The name comes from first leters of main components of Fabris VM:
 Similarity with the name of Italian fencing master Salvator Fabris
 is not a coincidence.
 
-
-..	INSPIRACJE
-	forth,joy,dssp,python,lisp,unix,factor
 
 Basic Syntax
 ============
@@ -88,7 +85,7 @@ Testing::
 
 Lambda expressions::
     
-    [" world" print] [ "hello" print ] call call -- prints "hello world"
+    [ " world" print ] [ "hello" print ] call call -- prints "hello world"
 
 Recurrency::
 
@@ -97,7 +94,7 @@ Recurrency::
 
 List reduction::
 
-    [1 3 5 7 9] list [add] fold -- sum all elements
+    [ 1 3 5 7 9 ] list [ add ] fold -- sum all elements
 
 Include module::
 
@@ -186,11 +183,11 @@ Comparators
   minus    (a--ax)    check if a < 0                                           yes 
   plus     (a--ax)    check if a > 0                                           
   less     (ab--ax)   check if a < b                                           
+  or-less  (ab--ax)   check if a <= b
   more     (ab--ax)   check if a > b                                           
+  or-more  (ab--ax)   check if a >= b
   equal    (ab--ax)   check if a == b                                          
   within   (nab--nx)  check if a <= n <= b                                     
-  or-more  (ab--ax)   check if a >= b
-  or-less  (ab--ax)   check if a <= b
   ======== ========== ======================================================== =====
 
 
@@ -229,31 +226,34 @@ Input/Output
   write   (anf--)    write n characters at address a to file with descriptor f
   ======= ======== ================================================================ =====
 
-Control Flow
+Control/Flow
 ------------
 
-  ======= ======== ================================================================ =====
-  name    effect   comments                                                         core
-  ======= ======== ================================================================ =====
-  def X   (--)     define new word X                                                yes
-  ret     (--)     return from definition                                           yes
-  macro X (--)     define new macro X                                               yes
-  mend    (--)     end macro definition                                             yes
-  then    (x--)    execute following code if x is not zero                          yes
-  else    (--)     branch for the then word (optional)                              yes
-  end     (--)     finish then/else sequence                                        yes
-  do      (--x)    start of unconditioned loop                                      yes
-  break   (x--)    break out of the current loop                                    yes
-  loop    (--)     repeat loop                                                      yes
-  times   (x--)    start of counted loop                                            yes
-  "X"     (--an)   start/end of a string, places addres and length on the stack     yes
-  [       (--)     start of anonymous code block                                    yes
-  ]       (--f)    end of anonymous code block                                      yes
-  call    (f--)    call code block referenced by f                                  yes
-  'X'     (--c)    start/end of a char                                              yes
-  X       (--x)    place integer X in the stack                                     yes
-  use X   (--)     use module X                                                     yes
-  ======= ======== ================================================================ =====
+  ======= ========= ================================================================ =====
+  name    effect    comments                                                         core
+  ======= ========= ================================================================ =====
+  def X   (--)      define new word X                                                yes
+  ret     (--)      return from definition                                           yes
+  macro X (--)      define new macro X                                               yes
+  mend    (--)      end macro definition                                             yes
+  then    (x--)     execute following code if x is not zero                          yes
+  else    (--)      branch for the then word (optional)                              yes
+  end     (--)      finish then/else sequence                                        yes
+  do      (=x)      start of unconditioned loop                                      yes
+  break   (x=)      break out of the current loop                                    yes
+  loop    (--)      repeat loop                                                      yes
+  times   (x--)(=i) start of counted loop                                            yes
+  "X"     (--an)    start/end of a string, places addres and length on the stack     yes
+  [       (--)      start of anonymous code block                                    yes
+  ]       (--r)     end of anonymous code block, put reference to it on the stack    yes
+  call    (r--)     call code block referenced by r                                  yes
+  'X'     (--c)     start/end of a char                                              yes
+  X       (--x)     place integer X in the stack                                     yes
+  use X   (--)      use module X                                                     yes
+  dyn X   (--)      declare word X as dynamic, that can change at the runtime        yes
+  ref X   (--r)     put reference to word X on the stack                             yes
+  as X    (r--)     redefine dynamic word X as code reference r                      yes
+  ======= ========= ================================================================ =====
 
 Other
 -----
@@ -340,9 +340,10 @@ More Arithmetic
   ========= ========= ============================================================
 
 
+.. _efficient:
+
 Performance
 ===========
-.. _fast:
 
 Different dispatching techniques results in different efficiency depending
 on the CPU architecture [1]_.
@@ -378,9 +379,10 @@ Related articles:
 .. [4] https://en.wikipedia.org/wiki/Threaded_code
 
 
+.. _compact:
+
 Minimalism
 ==========
-.. _compact:
 
 One of the design goals of Fabris is to be compact. That is why the language is divided
 into core words and extension words. Fabris implementation needs only to natively handle
@@ -394,3 +396,10 @@ Fabris core words:
   - 7 arithmetic and logic words: add, neg, zero, minus, and, or, not
   - 3 other words: emit, char, halt
   - 4 optional words: clock, take, argc, argv
+
+
+.. _simple:
+
+Simplicity
+==========
+
