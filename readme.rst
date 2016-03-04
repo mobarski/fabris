@@ -106,6 +106,15 @@ Include module::
 	print
     loop
 
+Top-down programming::
+
+    def c  b b add ret
+    def b  a a add ret
+    def a  1 ret
+    
+    a dot -- prints 4
+
+
 Functions
 =========
 
