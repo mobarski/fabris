@@ -109,7 +109,7 @@ Top-down programming::
     def b  a a add ret
     def a  1 ret
     
-    a dot -- prints 4
+    c dot -- prints 4
 
 
 Functions
