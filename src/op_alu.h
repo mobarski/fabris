@@ -113,11 +113,19 @@
 	op_less:
 		sp[0] = sp[-1]<sp[0] ? 1 : 0 ;
 		NEXT;
-		
+
+	op_or_less:
+		sp[0] = sp[-1]<=sp[0] ? 1 : 0 ;
+		NEXT;
+
 	op_more:
 		sp[0] = sp[-1]>sp[0] ? 1 : 0 ;
 		NEXT;
-		
+
+	op_or_more:
+		sp[0] = sp[-1]>=sp[0] ? 1 : 0 ;
+		NEXT;
+
 	op_equal:
 		sp[0] = sp[-1]==sp[0] ? 1 : 0 ;
 		NEXT;

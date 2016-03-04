@@ -21,8 +21,8 @@ Similarity with the name of Italian fencing master Salvator Fabris
 is not a coincidence.
 
 
-..	INSPIRACJA
-	forth,dssp,joy,factor,python,lisp,unix
+..	INSPIRACJE
+	forth,joy,dssp,python,lisp,unix,factor
 
 Basic Syntax
 ============
@@ -46,13 +46,13 @@ Conditional statement::
 	
 Conditional statement with alternative::
 
-    if 10 less not then "ten or more" else "nine or less" end
+    if 10 or-more then "ten or more" else "nine or less" end
 
 Conditional statement with multiple branches::
 
-    if 10 less not then "ten or more" else
-        8 less not then "eight or nine" else
-			"seven or less" end
+    10 or-more then "ten or more"   else
+     8 or-less then "eight or less" else
+	            "exactly nine"  end
 
 Counted loop::
 
@@ -189,7 +189,10 @@ Comparators
   more     (ab--ax)   check if a > b                                           
   equal    (ab--ax)   check if a == b                                          
   within   (nab--nx)  check if a <= n <= b                                     
+  or-more  (ab--ax)   check if a >= b
+  or-less  (ab--ax)   check if a <= b
   ======== ========== ======================================================== =====
+
 
 Logic
 -----

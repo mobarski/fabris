@@ -1,7 +1,6 @@
 source = """
 
-def a 42 ret
-ref a call dot
+1 1 or-more then "a" else "b" end print
 
 """
 
@@ -38,7 +37,7 @@ f9 = open('gen/compiled_call.h','w')
 f10 = open('gen/compiled_inline.h','w')
 f11 = open('gen/code_direct.h','w')
 
-ops = re.findall("(?xms) op_([a-z][a-z0-9]+): (.*?) (NEXT|JUMP);",raw)
+ops = re.findall("(?xms) op_([a-z][a-z0-9_]+): (.*?) (NEXT|JUMP);",raw)
 
 # dispatch
 opcode = {}
@@ -327,8 +326,8 @@ while tokens:
 	elif t in word:
 		code += [opcode['callx']]
 		code += [word[t]]
-	elif t in opcode:
-		code += [opcode[t]]
+	elif t.replace('-','_') in opcode:
+		code += [opcode[t.replace('-','_')]]
 	else:
 		code += [opcode['callx']]
 		if t not in undefined: undefined[t] = []
