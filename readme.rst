@@ -246,6 +246,7 @@ Control/Flow
   "X"     (--an)    start/end of a string, places addres and length on the stack     yes
   [       (--)      start of anonymous code block                                    yes
   ]       (--r)     end of anonymous code block, put reference to it on the stack    yes
+  _       (x--)     capture stack item into code block, right to left                yes
   call    (r--)     call code block referenced by r                                  yes
   'X'     (--c)     start/end of a char                                              yes
   X       (--x)     place integer X in the stack                                     yes

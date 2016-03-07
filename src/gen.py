@@ -1,6 +1,6 @@
 source = """
 
-1 1 or-more then "a" else "b" end print
+9 4 2 [ _ times _ loop ] call sprint
 
 """
 
@@ -234,18 +234,23 @@ while tokens:
 		code += [opcode['back']]
 		here = len(code)
 		pprint(ctrl)
+		tmp = []
 		while True:
 			kind,there = ctrl.pop(-1)
 			if kind=='times':
 				code += [here-there]
 				code[there] = here-there
+				tmp.reverse()
+				ctrl += tmp
 				break
 			elif kind=='do':
 				code += [here-there-2]
 				code[there] = here-there+2
+				tmp.reverse()
+				ctrl += tmp
 				break
 			else:
-				raise('ERROR: loop')
+				tmp +=[(kind,there)]
 	elif t=='break':
 		code += [opcode['break']]
 	elif t=='then':
@@ -296,13 +301,29 @@ while tokens:
 		code[there] = here-there + 1
 	elif t=='[':
 		code += [opcode['lambda']]
-		ctrl += [('lambda',len(code))]
+		ctrl += [('[',len(code))]
+		code += [0]
+	elif t=='_':
+		code += [opcode['pushx']]
+		ctrl += [('_',len(code))]
 		code += [0]
 	elif t==']':
 		code += [opcode['ret']]
 		here = len(code)
-		kind,there = ctrl.pop(-1)
-		code[there] = here-there + 1
+		slot_cnt = 0
+		while True:
+			kind,there = ctrl.pop(-1)
+			if kind=='[':
+				code[there] = here-there + 1
+				if slot_cnt>0:
+					code += [opcode['tos']]
+				break
+			elif kind=='_':
+				if slot_cnt==0:
+					code += [opcode['tor']]
+				code += [opcode['into']]
+				code += [there]
+				slot_cnt += 1
 	elif t=='as':
 		as_word = True
 	elif t=='ref':
@@ -334,10 +355,10 @@ while tokens:
 		undefined[t] += [len(code)]
 		code += [0]
 print(out_tokens)
-print(code)
-print(ctrl)
-print(macro)
-print(undefined)
+print('code:',code)
+print('ctrl:',ctrl)
+print('macro:',macro)
+print('undef:',undefined)
 
 #############################################
 #############################################
