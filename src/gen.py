@@ -1,6 +1,6 @@
 source = """
 
-9 4 2 [ _ times _ loop ] call sprint
+1 positive then "ok" else "error" end print
 
 """
 

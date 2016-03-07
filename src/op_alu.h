@@ -90,47 +90,47 @@
 		NEXT;
 	
 	op_not:
-		sp[0] = sp[0] ? 0 : 1 ;
+		sp[0] = sp[0] ? FALSE : TRUE ;
 		NEXT;
 	
 // === COMPARATORS ========
 	
 	op_zero:
-		sp[1] = sp[0] ? 0 : 1 ;
+		sp[1] = sp[0] ? FALSE : TRUE ;
 		sp += 1;
 		NEXT;
 		
-	op_plus:
-		sp[1] = sp[0]>0 ? 1 : 0 ;
+	op_positive:
+		sp[1] = sp[0]>0 ? TRUE : FALSE ;
 		sp += 1;
 		NEXT;
 		
-	op_minus:
-		sp[1] = sp[0]<0 ? 1 : 0 ;
+	op_negative:
+		sp[1] = sp[0]<0 ? TRUE : FALSE ;
 		sp += 1;
 		NEXT;
 		
 	op_less:
-		sp[0] = sp[-1]<sp[0] ? 1 : 0 ;
+		sp[0] = sp[-1]<sp[0] ? TRUE : FALSE ;
 		NEXT;
 
 	op_or_less:
-		sp[0] = sp[-1]<=sp[0] ? 1 : 0 ;
+		sp[0] = sp[-1]<=sp[0] ? TRUE : FALSE ;
 		NEXT;
 
 	op_more:
-		sp[0] = sp[-1]>sp[0] ? 1 : 0 ;
+		sp[0] = sp[-1]>sp[0] ? TRUE : FALSE ;
 		NEXT;
 
 	op_or_more:
-		sp[0] = sp[-1]>=sp[0] ? 1 : 0 ;
+		sp[0] = sp[-1]>=sp[0] ? TRUE : FALSE ;
 		NEXT;
 
 	op_equal:
-		sp[0] = sp[-1]==sp[0] ? 1 : 0 ;
+		sp[0] = sp[-1]==sp[0] ? TRUE : FALSE ;
 		NEXT;
 	
 	op_within:
-		sp[-1] = ((sp[-1]<=sp[-2]) & (sp[-2]<=sp[0])) ? 1 : 0 ;
+		sp[-1] = ((sp[-1]<=sp[-2]) & (sp[-2]<=sp[0])) ? TRUE : FALSE ;
 		sp -= 1;
 		NEXT;

@@ -42,6 +42,9 @@ uint utmp;
 int argcnt = 0;
 char **argval;
 
+#define TRUE -1
+#define FALSE 0
+
 // === RUN GOTO ======================================
 
 #define NEXT			goto *dispatch[*++ip]

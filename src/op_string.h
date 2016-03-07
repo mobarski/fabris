@@ -4,10 +4,10 @@
 		if (sp[0]>sp[-2]) {
 			sp[-1]=0;
 		} else {
-			tmp=1;
+			tmp=TRUE;
 			for (i=0;i<sp[0];i++) {
 				if (((char*)sp[-3])[i] != ((char*)sp[-1])[i]) {
-					tmp=0;
+					tmp=FALSE;
 					break;
 				}
 			}
@@ -20,10 +20,10 @@
 		if (sp[0]>sp[-2]) {
 			sp[-1]=0;
 		} else {
-			tmp=1;
+			tmp=TRUE;
 			for (i=0;i<sp[0];i++) {
 				if (((char*)sp[-3])[sp[-2]-1-i] != ((char*)sp[-1])[sp[0]-1-i]) {
-					tmp=0;
+					tmp=FALSE;
 					break;
 				}
 			}
