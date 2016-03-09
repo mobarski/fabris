@@ -7,7 +7,7 @@ Introduction
 ============
 
 Fabris is a `stack-oriented`_, `concatenative`_ language designed to be compact_,
-simple_ and efficient_. Fabris is inspired by Forth, Joy, DSSP, Python and Unix.
+simple_ and efficient_. Fabris is inspired by Forth, Joy, DSSP, Factor, Python and Unix.
 
 .. _stack-oriented: https://en.wikipedia.org/wiki/Stack-oriented_programming_language
 .. _concatenative: https://en.wikipedia.org/wiki/Concatenative_programming_language
@@ -15,7 +15,7 @@ simple_ and efficient_. Fabris is inspired by Forth, Joy, DSSP, Python and Unix.
 Current Fabris version is unstable and is intended only for experimental use.
 
 The name comes from first leters of main components of Fabris VM:
-(F)rame pointer, (A)llocators, (B)ase pointers, (R)eturn stack, (I)nstruction pointer, (S)tack.
+(F)ixed point base, (A)llocator stack, (B)uffer stack, (R)eturn stack, (I)nstruction pointer, (S)tack.
 
 Similarity with the name of Italian fencing master Salvator Fabris
 is not a coincidence.
@@ -71,12 +71,11 @@ New function definition::
 
     def square dup mul ret
 
-New function definition with named parameters::
-
-    def energy of h m v as
-        m v v mul mul 2 div -- kinetic energy
-        h m g mul mul -- potential energy
-        add ret
+..	New function definition with named parameters
+	def energy of h m v as
+		m v v mul mul 2 div -- kinetic energy
+		h m g mul mul -- potential energy
+		add ret
 
 Testing::
 
@@ -130,11 +129,6 @@ Functions
 Stack Manipulation
 ------------------
 
-..	TODO
-	r -> kopiuje gorny element r do s
-	rdrop -> odrzuca element z r
-	? jakies inne nazwy na operacje na r
-
   ======== =========== ============================================================ =====
   name     effect      comments                                                     core 
   ======== =========== ============================================================ =====
@@ -147,30 +141,43 @@ Stack Manipulation
   rot      (abc--bca)  rotate the third item to the top                                 
   unrot    (abc--cab)  unrotate the top to the third item                               
   depth    (--n)       push number of items on stack                                yes 
-  tor      (a--)(=a)   move the top item to the return stack                        yes 
-  tos      (--x)(a=)   move the top item of return stack to stack                   yes 
   mark     (--)(=n)    mark stack location (push stack depth to return stack)           
-  count    (--x)(n=)   push number of items after the mark, unmark stack
-  cut      (?--)(n=)   drop items after marked stack location  
+  count    (--x)(n=)   push number of items after the mark, unmark stack                
+  cut      (?--)(n=)   drop items after marked stack location                           
   yank     (--a)(ab=b) remove second item from return stack and place it on stack       
+  tor      (a--)(=a)   move the top item to the return stack                        yes 
+  r        (--x)(a=)   move the top item of return stack to stack                   yes
+  toa      (a--)(=a)   move the top item to the allocator stack                     yes 
+  a        (--x)(a=)   move the top item of allocator stack to stack                yes
+  tob      (a--)(=a)   move the top item to the buffer stack                        yes 
+  b        (--x)(a=)   move the top item of buffer stack to stack                   yes
+  tof      (a--)       move the top item to the fixed point base                    yes
+  f        (--x)       push fixed point base to stack                               yes
+  mark-a   (--)(=n)      mark a-stack location (push stack depth to return stack)       
+  mark-b   (--)(=n)      mark a-stack location (push stack depth to return stack)        
+  cut-a    (--)(n=)      drop items after marked a-stack location                        
+  cut-b    (--)(n=)      drop items after marked b-stack location                        
   ======== =========== ============================================================ =====
+
 
 Basic Arithmetic
 ----------------
 
-  ======== ========= ======================================================== =====
-  name     effect    comments                                                 core
-  ======== ========= ======================================================== =====
-  add      (ab--x)   add two top items (a+b)                                  yes
+  ======== ========= ================================================================== =====
+  name     effect    comments                                                           core
+  ======== ========= ================================================================== =====
+  add      (ab--x)   add two top items (a+b)                                            yes
   sub      (ab--x)   subtract top item from second item (a-b)
   mul      (ab--x)   multiply two top items (a*b)
   div      (ab--x)   divide second item by top item (a/b)
   mod      (ab--x)   reminder of dividing second item by top item (a%b)
   inc      (a--x)    increment the top item (a+1)
   dec      (a--x)    decrement the top item (a-1)
-  abs      (a--x)    return absolute value (abs(a))
-  neg      (a--x)    change the sign (-a)                                     yes
-  ======== ========= ======================================================== =====
+  abs      (a--x)    return absolute value (abs(a)) 
+  neg      (a--x)    change the sign (-a)                                               yes
+  fmul     (ab--x)   fixed point - multiply two top items (a*b)                           
+  fdiv     (ab--x)   fixed point - divide of second item by top item (a/b)                
+  ======== ========= ================================================================== =====
 
 
 Comparators
@@ -180,8 +187,8 @@ Comparators
   name     effect     comments                                                 core
   ======== ========== ======================================================== =====
   zero     (a--ax)    check if a == 0                                          yes 
-  minus    (a--ax)    check if a < 0                                           yes 
-  plus     (a--ax)    check if a > 0                                           
+  negative (a--ax)    check if a < 0                                           yes 
+  positive (a--ax)    check if a > 0                                           
   less     (ab--ax)   check if a < b                                           
   or-less  (ab--ax)   check if a <= b
   more     (ab--ax)   check if a > b                                           
@@ -199,7 +206,7 @@ Logic
   ===== ======== ============================================== =====
   and   (ab--x)  and two top items (a&b)                        yes
   or    (ab--x)  or two top items (a|b)                         yes
-  xor   (ab--x)  xor two top items (a^b)                        ?
+  xor   (ab--x)  xor two top items (a^b)                        yes
   shl   (ab--x)  shift a left by b bits (a<<b)
   shr   (ab--x)  shift a right by b bits (a>>b)
   ushr  (ab--x)  shift unsigned a right by b bits (a>>b)
@@ -285,7 +292,7 @@ String Manipulation
   rstrip    (an--bx)     return string without trailing whitespaces
   substr    (ankc--anbc) return substring of c characters starting at b
   index     (anbm--anx)  return index of bm string within an string, or -1
-  char      (ani--anx)   return character at index i in given string                 yes
+  char      (ani--anx)   return character at index i in given string                 yes?
   upper     (an--an)       destructive change to lowercase
   lower     (an--an)       destructive change to uppercase
   ========= ============ =========================================================== =====
@@ -308,21 +315,25 @@ String Comparators
 More Stack Manipulation
 -----------------------
 
-  ======== ============ ===========================================================
-  name     effect       comments
-  ======== ============ ===========================================================
-  dup2     (ab--abab)   duplicate top pair
-  swap2    (abxy--xyab) swap two pairs
-  drop2    (ab--)       drop pair
-  pick     (n--x)       pick nth stack item from top (not counting n)
-  ndrop    (?n--?)      discard n top items (not counting n)
-  reverse  (?n--?n)     reverse order of n top stack items
-  reverse2 (?n--?n)       reverse order of n top stack pairs
-  push     (?n--)       push n items from stack to return stack
-  revpush  (?n--)         push n items from stack to return stack in reverse order
-  pop      (n--?)       pop n items from return stack onto stack
-  revpop   (n--?)       pop n items from return stack onto stack in reverse order
-  ======== ============ ===========================================================
+  ========= ============ ===========================================================
+  name      effect       comments
+  ========= ============ ===========================================================
+  dup2      (ab--abab)   duplicate top pair
+  swap2     (abxy--xyab) swap two pairs
+  drop2     (ab--)       drop pair
+  pick      (n--x)       pick nth stack item from top (not counting n)
+  ndrop     (?n--?)      discard n top items (not counting n)
+  reverse   (?n--?n)     reverse order of n top stack items
+  reverse2  (?n--?n)       reverse order of n top stack pairs
+  push-a    (?n--)       push n items from stack to a-stack
+  revpush-a (?n--)         push n items from stack to a-stack in reverse order
+  pop-a     (n--?)       pop n items from a-stack onto stack
+  revpop-a  (n--?)         pop n items from a-stack onto stack in reverse order
+  push-b    (?n--)       push n items from stack to b-stack
+  revpush-b (?n--)         push n items from stack to b-stack in reverse order
+  pop-b     (n--?)       pop n items from b-stack onto stack
+  revpop-b  (n--?)         pop n items from b-stack onto stack in reverse order
+  ========= ============ ===========================================================
 
 
 More Arithmetic
@@ -385,19 +396,18 @@ Related articles:
 Minimalism
 ==========
 
-One of the design goals of Fabris is to be compact. That is why the language is divided
-into core words and extension words. Fabris implementation needs only to natively handle
-core words to provide ability to compile any Fabris program as every extension word
-can be writen in Fabris using only core words. In practice most standard Fabris words
-are natively implemented because they are designed to be easily implemented in C.
-
-Fabris core words:
-  - 12 control flow words: def, ret, then, else, end, [, ], call, ", do, break, loop
-  - 6 stack manipulation words: swap, dup, drop, tos, tor, depth
-  - 7 arithmetic and logic words: add, neg, zero, minus, and, or, not
-  - 3 other words: emit, char, halt
-  - 4 optional words: clock, take, argc, argv
-
+..	OLD:
+	One of the design goals of Fabris is to be compact. That is why the language is divided
+	into core words and extension words. Fabris implementation needs only to natively handle
+	core words to provide ability to compile any Fabris program as every extension word
+	can be writen in Fabris using only core words. In practice most standard Fabris words
+	are natively implemented because they are designed to be easily implemented in C.
+	Fabris core words:
+	- 12 control flow words: def, ret, then, else, end, [, ], call, ", do, break, loop
+	- 6 stack manipulation words: swap, dup, drop, tos, tor, depth
+	- 7 arithmetic and logic words: add, neg, zero, minus, and, or, not
+	- 3 other words: emit, char, halt
+	- 4 optional words: clock, take, argc, argv
 
 .. _simple:
 

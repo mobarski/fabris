@@ -40,6 +40,18 @@
 	op_neg:
 		sp[0] = -sp[0];
 		NEXT;
+	
+	op_fmul:
+		wtmp = sp[-1] * sp[0] / fpb;
+		sp[-1] = wtmp;
+		sp -= 1;
+		NEXT;
+
+	op_fdiv:
+		wtmp = sp[-1] * fpb / sp[0] ;
+		sp[-1] = wtmp;
+		sp -= 1;
+		NEXT;
 
 // === MORE ARITHMETIC =======
 

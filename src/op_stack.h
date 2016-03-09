@@ -87,12 +87,46 @@
 		rp -= 1;
 		NEXT;
 		
-	op_tos:
+	op_r:
 		sp[1] = (uint)rp[0];
 		sp += 1;
 		rp += 1;
 		NEXT;
-		
+
+	op_toa:
+		ap[1] = sp[0];
+		sp -= 1;
+		ap += 1;
+		NEXT;
+
+	op_tob:
+		bp[1] = sp[0];
+		sp -= 1;
+		bp -= 1;
+		NEXT;
+	
+	ap_a:
+		sp[1] = ap[0];
+		sp += 1;
+		ap -= 1;
+		NEXT;
+	
+	op_b:
+		sp[1] = bp[0];
+		sp += 1;
+		bp += 1;
+		NEXT;
+
+	op_tof:
+		fpb = sp[0];
+		sp -= 1;
+		NEXT;
+	
+	op_f:
+		sp[1] = fpb;
+		sp += 1;
+		NEXT;
+
 	op_reverse:
 		for (i=0;i<sp[0]>>1;i++) {
 			tmp = sp[-i-1];
@@ -124,6 +158,22 @@
 		rp -= sp[0];
 		sp -= sp[0]+1;
 		NEXT;
+	
+	op_push_a:
+		for (i=0;i<sp[0];i++) {
+			ap[1+i] = sp[-1-i];
+		}
+		ap += sp[0];
+		sp -= sp[0]+1;
+		NEXT;
+
+	op_push_b:
+		for (i=0;i<sp[0];i++) {
+			bp[-1-i] = sp[-1-i];
+		}
+		bp -= sp[0];
+		sp -= sp[0]+1;
+		NEXT;
 		
 	op_pop:
 		tmp = sp[0];
@@ -131,6 +181,24 @@
 			sp[i]=(int)rp[i];
 		}
 		rp += tmp;
+		sp += tmp-1;
+		NEXT;
+	
+	op_pop_a:
+		tmp = sp[0];
+		for (i=0;i<tmp;i++) {
+			sp[i] = ap[-i];
+		}
+		ap -= tmp;
+		sp += tmp-1;
+		NEXT;
+
+	op_pop_b:
+		tmp = sp[0];
+		for (i=0;i<tmp;i++) {
+			sp[i] = bp[i];
+		}
+		bp += tmp;
 		sp += tmp-1;
 		NEXT;
 		
@@ -142,7 +210,7 @@
 		rp += tmp;
 		sp += tmp-1;
 		NEXT;
-		
+	
 	op_pick:
 		sp[0] = sp[-sp[0]-1];
 		NEXT;

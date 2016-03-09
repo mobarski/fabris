@@ -30,6 +30,17 @@
 		}
 		JUMP;
 	
+	op_pushxf: //ARG 1234
+		tmp = (int)(ip[2]);
+		while (tmp>fpb) tmp /= 10;
+		while (tmp<fpb) tmp *= 10;
+		tmp /= 10;
+		tmp += (int)(ip[1]) * fpb;
+		sp[1] = tmp;
+		sp += 1;
+		ip += 3;
+		JUMP;
+		
 // ===  FLOW ===============
 		
 	op_skip: //ARG 12

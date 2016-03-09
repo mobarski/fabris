@@ -23,18 +23,25 @@ int *sp;		// data stack pointer - grows up
 token **rp;	// return stack pointer - grows down
 #endif
 
-token **fp;	// frame pointer
+int fpb;		// fixed point base
+int *ap;		// allocator stack pointer - grows up
+int *bp;		// buffer stack pointer - grows down
 
+int *abase;	// allocator stack base
+int *bbase;	// buffer stack base
+token **rbase;	// return stack base
 token *ibase;	// instructions base 
 int *sbase;	// data stack base
-token **rbase;	// return stack base
+
 
 #define uint unsigned int
+#define wint long long int
 #define uchar unsigned char
 
 int i,j,k;
 int tmp;
 uint utmp;
+wint wtmp;
 
 #define UTMP_LOAD_4() 	utmp = (uint)ip[1];
 #define TMP_LOAD_4()	tmp = (int)ip[1];
@@ -76,13 +83,19 @@ void run_goto() {
 
 // ==================================================
 
-void init(int *stack, int cells, token *code) {
+void init(int *stack, int cells, int *stack2, int cells2, token *code) {
 	ip=code;
 	sp=stack;
 	rp=(token**)(stack+cells);
+	ap=stack2;
+	bp=stack2+cells2;
+	
+	abase=ap;
+	bbase=bp;
+	rbase=rp;
 	ibase=ip;
 	sbase=sp;
-	rbase=rp;
+	fpb=1;
 }
 
 void runcode() {
@@ -90,7 +103,8 @@ void runcode() {
 		#include "gen/code.h"
 	};
 	int mem[1024];
-	init(&mem[0],1024,code);
+	int mem2[4*1024];
+	init(&mem[0],1024,&mem2[0],4*1024,code);
 	
 	run_goto();
 	//run_switch();
