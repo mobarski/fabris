@@ -123,12 +123,20 @@
 		JUMP;
 		
 	op_ret:
-		ip=rp[0]; rp+=1;
+		ip=rp[0];
+		rp+=1;
 		JUMP;
 		
 	op_retv: // TEST 
 		rp += 1+(uint)rp[0];
 		ip=rp[0]; rp+=1;
+		JUMP;
+	
+	op_yield:
+		sp[1] = (int)(ip-ibase+1);
+		ip=rp[0];
+		rp+=1;
+		sp+=1;
 		JUMP;
 		
 // === ??? ============================

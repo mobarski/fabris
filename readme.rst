@@ -7,7 +7,9 @@ Introduction
 ============
 
 Fabris is a `stack-oriented`_, `concatenative`_ language designed to be compact_,
-simple_ and efficient_. Fabris is inspired by Forth, Joy, DSSP, Factor, Python and Unix.
+simple_ and efficient_.
+
+Fabris is inspired by Forth, Python, Joy, DSSP, Factor, COBOL and Unix.
 
 .. _stack-oriented: https://en.wikipedia.org/wiki/Stack-oriented_programming_language
 .. _concatenative: https://en.wikipedia.org/wiki/Concatenative_programming_language
@@ -140,23 +142,31 @@ Stack Manipulation
   tuck     (ab--bab)   insert copy of top item before second item                       
   rot      (abc--bca)  rotate the third item to the top                                 
   unrot    (abc--cab)  unrotate the top to the third item                               
+  yank     (--a)(ab=b) remove second item from return stack and place it on stack       
+  tor      (a--)(=a)   move the top item to the return stack                        yes 
+  r        (--x)(a=)   move the top item of return stack to stack                   yes
   depth    (--n)       push number of items on stack                                yes 
   mark     (--)(=n)    mark stack location (push stack depth to return stack)           
   count    (--x)(n=)   push number of items after the mark, unmark stack                
   cut      (?--)(n=)   drop items after marked stack location                           
-  yank     (--a)(ab=b) remove second item from return stack and place it on stack       
-  tor      (a--)(=a)   move the top item to the return stack                        yes 
-  r        (--x)(a=)   move the top item of return stack to stack                   yes
   toa      (a--)(=a)   move the top item to the allocator stack                     yes 
+  ======== =========== ============================================================ =====
+
+
+  ======== =========== ============================================================ =====
+  name     effect      comments                                                     core 
+  ======== =========== ============================================================ =====
   a        (--x)(a=)   move the top item of allocator stack to stack                yes
   tob      (a--)(=a)   move the top item to the buffer stack                        yes 
   b        (--x)(a=)   move the top item of buffer stack to stack                   yes
-  tof      (a--)       move the top item to the fixed point base                    yes
-  f        (--x)       push fixed point base to stack                               yes
   mark-a   (--)(=n)      mark a-stack location (push stack depth to return stack)       
   mark-b   (--)(=n)      mark a-stack location (push stack depth to return stack)        
   cut-a    (--)(n=)      drop items after marked a-stack location                        
   cut-b    (--)(n=)      drop items after marked b-stack location                        
+  chars    (n--x)        calculate number of items for storing n characters
+  bytes    (n--x)        calculate number of items for storing n bytes
+  alloc    (n--r)        allocate n items on allocator stack and push reference
+  buffer   (n--r)        allocate n items on buffer stack and push reference
   ======== =========== ============================================================ =====
 
 
@@ -175,8 +185,10 @@ Basic Arithmetic
   dec      (a--x)    decrement the top item (a-1)
   abs      (a--x)    return absolute value (abs(a)) 
   neg      (a--x)    change the sign (-a)                                               yes
-  fmul     (ab--x)   fixed point - multiply two top items (a*b)                           
-  fdiv     (ab--x)   fixed point - divide of second item by top item (a/b)                
+  fmul     (ab--x)   fixed point - multiply two top items (a*b)                         yes  
+  fdiv     (ab--x)   fixed point - divide of second item by top item (a/b)              yes  
+  tof      (a--)     move the top item to the fixed point base                          yes
+  f        (--x)     push fixed point base to stack                                     yes
   ======== ========= ================================================================== =====
 
 
@@ -255,6 +267,7 @@ Control/Flow
   ]       (--r)     end of anonymous code block, put reference to it on the stack    yes
   _       (x--)     capture stack item into code block, right to left                yes
   call    (r--)     call code block referenced by r                                  yes
+  yield   (--r)     return and push reference to next instruction                    yes
   'X'     (--c)     start/end of a char                                              yes
   X       (--x)     place integer X in the stack                                     yes
   use X   (--)      use module X                                                     yes
