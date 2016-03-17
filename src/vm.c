@@ -26,6 +26,7 @@ token **rp;	// return stack pointer - grows down
 int fpb;		// fixed point base
 int *ap;		// allocator stack pointer - grows up
 int *bp;		// buffer stack pointer - grows down
+int ir;		// index register
 
 int *abase;	// allocator stack base
 int *bbase;	// buffer stack base

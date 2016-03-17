@@ -214,3 +214,21 @@
 	op_pick:
 		sp[0] = sp[-sp[0]-1];
 		NEXT;
+
+// ===  ALLOCATION ==================
+
+	op_chars:
+		sp[0] = (sp[0]+1) % 4 ? 1+(sp[0]+1)/4 : (sp[0]+1)/4; 
+		NEXT;
+
+	op_alloc:
+		tmp = sp[0];
+		sp[0] = (int)&ap[0];
+		ap += tmp;
+		NEXT;
+
+	op_buffer:
+		tmp = sp[0];
+		sp[0] = (int)&bp[-tmp];
+		bp -= tmp;
+		NEXT;

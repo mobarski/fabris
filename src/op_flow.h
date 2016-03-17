@@ -139,6 +139,32 @@
 		sp+=1;
 		JUMP;
 		
+// === PARAMETERS =====================
+
+	op_in:
+		rp[-1]=(token*)(ir);
+		ir=(int)(sp-sbase)-(int)ip[1]+1;
+		rp-=1;
+		ip+=2;
+		NEXT;
+	
+	op_ix:
+		sp[1] = sbase[ir+(int)ip[1]];
+		sp+=1;
+		ip+=2;
+		JUMP;
+	
+	op_iret:
+		tmp = (int)ip[1];
+		for (i=0;i<tmp;i++) {
+			sbase[ir+i] = sp[1-tmp+i];
+		}
+		sp=&sbase[ir+tmp-1];
+		ir=(int)rp[0];
+		ip=rp[1];
+		rp+=2;
+		JUMP;
+	
 // === ??? ============================
 
 // TODO change to be able to run from ROM

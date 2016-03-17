@@ -1,6 +1,10 @@
 source = """
 
-1 positive then "ok" else "error" end print
+def zzz in x y z out 2
+	sprint 1 2 3 sprint
+	ret
+
+11 22 33 44 55 66 sprint zzz sprint
 
 """
 
@@ -37,7 +41,7 @@ f9 = open('gen/compiled_call.h','w')
 f10 = open('gen/compiled_inline.h','w')
 f11 = open('gen/code_direct.h','w')
 
-ops = re.findall("(?xms) op_([a-z][a-z0-9_]+): (.*?) (NEXT|JUMP);",raw)
+ops = re.findall("(?xms) op_([a-z][a-z0-9_]*): (.*?) (NEXT|JUMP);",raw)
 
 # dispatch
 opcode = {}
@@ -113,6 +117,10 @@ dynamic = set()
 def_dyn = False
 as_word = False
 ref_word = False
+def_input = False
+def_output = False
+curr_input = []
+curr_output = None
 
 
 while tokens:
@@ -132,15 +140,7 @@ while tokens:
 
 	op_ips.add(len(code))
 	
-	# conversion
-	try:
-		x = int(t)
-		code += [opcode['pushx']]
-		code += [x]
-		continue
-	except: pass
-	
-	# names
+	# names / modes
 	if def_var:
 		var[t] = len(code)
 		code += [0]
@@ -157,6 +157,8 @@ while tokens:
 			for pos in undefined[t]:
 				code[pos] = word[t]
 			del undefined[t]
+		curr_input = []
+		curr_output = None
 		continue
 	elif into_var:
 		code += [var[t]]
@@ -189,11 +191,47 @@ while tokens:
 		as_word = False
 		continue
 	elif ref_word:
-		code += [opcode['pushx']]
-		code += [word[t]]
+		if t in word:
+			code += [opcode['pushx']]
+			code += [word[t]]
+		else:
+			raise # TODO ? wrap opcode
 		ref_word = False
 		continue
-	
+	elif def_input:
+		if t=='out':
+			def_input=False
+			def_output=True
+			code += [opcode['in']]
+			code += [len(curr_input)]
+		else:
+			curr_input += [t]
+		continue
+	elif def_output:
+		curr_output = int(t)
+		def_output = False
+		continue
+
+	# conversion
+	if re.match('([+-]?\d+[.]\d*)|([+-]?\d*[.]\d+)',t):
+		a,b = t.split('.')
+		if not a: a='0'
+		if not b: b='0'
+		a=int(a)
+		b=int(b)
+		print("fixed point",t,a,b)
+		code += [opcode['pushxf']]
+		code += [a]		
+		code += [b]		
+		continue
+	try:
+		x = int(t)
+		code += [opcode['pushx']]
+		code += [x]
+		continue
+	except: pass
+
+	# normal
 	if t[0]=='(':
 		continue
 	elif t.startswith('--'):
@@ -295,7 +333,11 @@ while tokens:
 		if code[-2]==opcode['callx']:
 			code[-2] = opcode['tailcallx']
 		else:
-			code += [opcode['ret']]
+			if curr_output == None:
+				code += [opcode['ret']]
+			else:
+				code += [opcode['iret']]
+				code += [curr_output]
 		here = len(code)
 		kind,there = ctrl.pop(-1)
 		code[there] = here-there + 1
@@ -316,7 +358,7 @@ while tokens:
 			if kind=='[':
 				code[there] = here-there + 1
 				if slot_cnt>0:
-					code += [opcode['tos']]
+					code += [opcode['r']]
 				break
 			elif kind=='_':
 				if slot_cnt==0:
@@ -334,9 +376,14 @@ while tokens:
 		use_mod = True
 	elif t=='macro':
 		def_macro = True
+	elif t=='in':
+		def_input = True
 	###
 	elif t in macro:
 		tokens[0:0] = macro[t]
+	elif t in curr_input:
+		code += [opcode['ix']]
+		code += [curr_input.index(t)]
 	elif t in var:
 		code += [opcode['pushv']]
 		code += [var[t]]

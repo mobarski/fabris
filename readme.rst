@@ -73,11 +73,12 @@ New function definition::
 
     def square dup mul ret
 
-..	New function definition with named parameters
-	def energy of h m v as
+New function definition with named parameters::
+
+	def energy in h m v out 1 (e)
 		m v v mul mul 2 div -- kinetic energy
 		h m g mul mul -- potential energy
-		add ret
+		add (e) ret
 
 Testing::
 
@@ -106,11 +107,11 @@ Include module::
 
 Top-down programming::
 
-    def c  b b add ret
-    def b  a a add ret
-    def a  1 ret
+    def c b ret
+    def b a ret
+    def a 42 ret
     
-    c dot -- prints 4
+    c dot -- prints 42
 
 
 Functions
@@ -137,28 +138,30 @@ Stack Manipulation
   swap     (ab--ba)    swap the two top stack items                                 yes 
   dup      (a--aa)     duplicate the top stack item                                 yes 
   drop     (a--)       discard the top item                                         yes 
-  over     (ab--aba)   push the second item on top                                      
-  nip      (ab--b)     discard the second item                                          
-  tuck     (ab--bab)   insert copy of top item before second item                       
-  rot      (abc--bca)  rotate the third item to the top                                 
-  unrot    (abc--cab)  unrotate the top to the third item                               
-  yank     (--a)(ab=b) remove second item from return stack and place it on stack       
-  tor      (a--)(=a)   move the top item to the return stack                        yes 
-  r        (--x)(a=)   move the top item of return stack to stack                   yes
-  depth    (--n)       push number of items on stack                                yes 
-  mark     (--)(=n)    mark stack location (push stack depth to return stack)           
-  count    (--x)(n=)   push number of items after the mark, unmark stack                
-  cut      (?--)(n=)   drop items after marked stack location                           
+  depth    (--n)       push number of items on stack                                yes
+  tof      (a--)       move the top item to the fixed point base                    yes
   toa      (a--)(=a)   move the top item to the allocator stack                     yes 
+  tob      (a--)(=a)   move the top item to the buffer stack                        yes 
+  tor      (a--)(=a)   move the top item to the return stack                        yes 
+  f        (--x)       push fixed point base to stack                               yes
+  a        (--x)(a=)   move the top item of allocator stack to stack                yes
+  b        (--x)(a=)   move the top item of buffer stack to stack                   yes
+  r        (--x)(a=)   move the top item of return stack to stack                   yes
   ======== =========== ============================================================ =====
 
 
   ======== =========== ============================================================ =====
   name     effect      comments                                                     core 
   ======== =========== ============================================================ =====
-  a        (--x)(a=)   move the top item of allocator stack to stack                yes
-  tob      (a--)(=a)   move the top item to the buffer stack                        yes 
-  b        (--x)(a=)   move the top item of buffer stack to stack                   yes
+  over     (ab--aba)   push the second item on top                                      
+  nip      (ab--b)     discard the second item                                          
+  tuck     (ab--bab)   insert copy of top item before second item                       
+  rot      (abc--bca)  rotate the third item to the top                                 
+  unrot    (abc--cab)  unrotate the top to the third item                               
+  yank     (--a)(ab=b) remove second item from return stack and place it on stack       
+  mark     (--)(=n)    mark stack location (push stack depth to return stack)           
+  count    (--x)(n=)   push number of items after the mark, unmark stack                
+  cut      (?--)(n=)   drop items after marked stack location                           
   mark-a   (--)(=n)      mark a-stack location (push stack depth to return stack)       
   mark-b   (--)(=n)      mark a-stack location (push stack depth to return stack)        
   cut-a    (--)(n=)      drop items after marked a-stack location                        
@@ -167,7 +170,28 @@ Stack Manipulation
   bytes    (n--x)        calculate number of items for storing n bytes
   alloc    (n--r)        allocate n items on allocator stack and push reference
   buffer   (n--r)        allocate n items on buffer stack and push reference
+  ndrop    (?n--)      discard n top items (not counting n)                         
   ======== =========== ============================================================ =====
+
+
+  ========= ============ ===========================================================
+  name      effect       comments
+  ========= ============ ===========================================================
+  dup2      (ab--abab)   duplicate top pair
+  swap2     (abxy--xyab) swap two pairs
+  drop2     (ab--)       drop pair
+  pick      (n--x)       pick nth stack item from top (not counting n)
+  reverse   (?n--?n)     reverse order of n top stack items
+  reverse2  (?n--?n)       reverse order of n top stack pairs
+  push-a    (?n--)       push n items from stack to a-stack
+  revpush-a (?n--)         push n items from stack to a-stack in reverse order
+  pop-a     (n--?)       pop n items from a-stack onto stack
+  revpop-a  (n--?)         pop n items from a-stack onto stack in reverse order
+  push-b    (?n--)       push n items from stack to b-stack
+  revpush-b (?n--)         push n items from stack to b-stack in reverse order
+  pop-b     (n--?)       pop n items from b-stack onto stack
+  revpop-b  (n--?)         pop n items from b-stack onto stack in reverse order
+  ========= ============ ===========================================================
 
 
 Basic Arithmetic
@@ -187,8 +211,6 @@ Basic Arithmetic
   neg      (a--x)    change the sign (-a)                                               yes
   fmul     (ab--x)   fixed point - multiply two top items (a*b)                         yes  
   fdiv     (ab--x)   fixed point - divide of second item by top item (a/b)              yes  
-  tof      (a--)     move the top item to the fixed point base                          yes
-  f        (--x)     push fixed point base to stack                                     yes
   ======== ========= ================================================================== =====
 
 
@@ -274,6 +296,8 @@ Control/Flow
   dyn X   (--)      declare word X as dynamic, that can change at the runtime        yes
   ref X   (--r)     put reference to word X on the stack                             yes
   as X    (r--)     redefine dynamic word X as code reference r                      yes
+  in X... (--)      define names of input parameters                                 yes
+  out X   (--)      define number of output parameters                               yes
   ======= ========= ================================================================ =====
 
 Other
@@ -323,30 +347,6 @@ String Comparators
   arein     (anbm--anx)    return true if an string contains any character from bm string
   haschar   (anc--anx)     return true if an string contains character c
   ========= ============ ===================================================================
-
-
-More Stack Manipulation
------------------------
-
-  ========= ============ ===========================================================
-  name      effect       comments
-  ========= ============ ===========================================================
-  dup2      (ab--abab)   duplicate top pair
-  swap2     (abxy--xyab) swap two pairs
-  drop2     (ab--)       drop pair
-  pick      (n--x)       pick nth stack item from top (not counting n)
-  ndrop     (?n--?)      discard n top items (not counting n)
-  reverse   (?n--?n)     reverse order of n top stack items
-  reverse2  (?n--?n)       reverse order of n top stack pairs
-  push-a    (?n--)       push n items from stack to a-stack
-  revpush-a (?n--)         push n items from stack to a-stack in reverse order
-  pop-a     (n--?)       pop n items from a-stack onto stack
-  revpop-a  (n--?)         pop n items from a-stack onto stack in reverse order
-  push-b    (?n--)       push n items from stack to b-stack
-  revpush-b (?n--)         push n items from stack to b-stack in reverse order
-  pop-b     (n--?)       pop n items from b-stack onto stack
-  revpop-b  (n--?)         pop n items from b-stack onto stack in reverse order
-  ========= ============ ===========================================================
 
 
 More Arithmetic

@@ -55,9 +55,8 @@
 		
 	op_sprint:
 		printf("depth:%u  ->  ",sp-sbase);
-		printf("[%d] ",sp[0]);
-		for (i=-1; i>=sbase-sp; i--)
-			printf("%d ",sp[i]);
+		for (i=1; i<=sp-sbase; i++)
+			printf("%d ",sbase[i]);
 		printf("\n");
 		NEXT;
 		
