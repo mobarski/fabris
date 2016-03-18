@@ -93,30 +93,6 @@
 		rp += 1;
 		NEXT;
 
-	op_toa:
-		ap[1] = sp[0];
-		sp -= 1;
-		ap += 1;
-		NEXT;
-
-	op_tob:
-		bp[1] = sp[0];
-		sp -= 1;
-		bp -= 1;
-		NEXT;
-	
-	ap_a:
-		sp[1] = ap[0];
-		sp += 1;
-		ap -= 1;
-		NEXT;
-	
-	op_b:
-		sp[1] = bp[0];
-		sp += 1;
-		bp += 1;
-		NEXT;
-
 	op_tof:
 		fpb = sp[0];
 		sp -= 1;
@@ -158,22 +134,6 @@
 		rp -= sp[0];
 		sp -= sp[0]+1;
 		NEXT;
-	
-	op_push_a:
-		for (i=0;i<sp[0];i++) {
-			ap[1+i] = sp[-1-i];
-		}
-		ap += sp[0];
-		sp -= sp[0]+1;
-		NEXT;
-
-	op_push_b:
-		for (i=0;i<sp[0];i++) {
-			bp[-1-i] = sp[-1-i];
-		}
-		bp -= sp[0];
-		sp -= sp[0]+1;
-		NEXT;
 		
 	op_pop:
 		tmp = sp[0];
@@ -184,24 +144,6 @@
 		sp += tmp-1;
 		NEXT;
 	
-	op_pop_a:
-		tmp = sp[0];
-		for (i=0;i<tmp;i++) {
-			sp[i] = ap[-i];
-		}
-		ap -= tmp;
-		sp += tmp-1;
-		NEXT;
-
-	op_pop_b:
-		tmp = sp[0];
-		for (i=0;i<tmp;i++) {
-			sp[i] = bp[i];
-		}
-		bp += tmp;
-		sp += tmp-1;
-		NEXT;
-		
 	op_revpop:
 		tmp = sp[0];
 		for (i=0;i<tmp;i++) {
@@ -219,16 +161,4 @@
 
 	op_chars:
 		sp[0] = (sp[0]+1) % 4 ? 1+(sp[0]+1)/4 : (sp[0]+1)/4; 
-		NEXT;
-
-	op_alloc:
-		tmp = sp[0];
-		sp[0] = (int)&ap[0];
-		ap += tmp;
-		NEXT;
-
-	op_buffer:
-		tmp = sp[0];
-		sp[0] = (int)&bp[-tmp];
-		bp -= tmp;
 		NEXT;

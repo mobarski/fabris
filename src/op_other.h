@@ -16,6 +16,10 @@
 	op_dot:
 		printf("%d ",sp[0]);
 		NEXT;
+	
+	op_fdot:
+		printf("%d.%d ",sp[0]/fpb,abs(sp[0])%fpb);
+		NEXT;
 		
 	op_udot:
 		printf("%u ",sp[0]);
@@ -37,6 +41,8 @@
 		NEXT;
 		
 	op_trace:
+		printf("ip:%u sp:%u rp:%u bp:%u\n",ip-ibase,sp-sbase,rbase-rp,bp);
+		/*
 		printf("ip:%u  ->  ",ip-ibase);
 		for (i=-10; i<0; i++)
 			printf("%d ",ip[i]);
@@ -45,12 +51,14 @@
 			printf("%d ",ip[i]);
 		printf("\n");
 		printf("sp:%u  ->  ",sp-sbase);
-		for (i=3; i>0; i--)
+		for (i=-6; i<=-1; i++)
 			printf("%d ",sp[i]);
 		printf("[%x] ",sp[0]);
-		for (i=-1; i>=-6; i--)
+		for (i=1; i<=3; i++)
 			printf("%d ",sp[i]);
 		printf("\n");
+		printf("bp:%u\n",bp);
+		*/
 		NEXT;
 		
 	op_sprint:

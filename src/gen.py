@@ -1,11 +1,9 @@
 source = """
-
-def zzz in x y z out 2
-	sprint 1 2 3 sprint
-	ret
-
-11 22 33 44 55 66 sprint zzz sprint
-
+    1000 tof
+    3.14159 2 mul fdot
+    --3.14159 2.0 fmul fdot 
+    --3141 2 mul fdot
+    --3141 2000 fmul fdot
 """
 
 ##############################################

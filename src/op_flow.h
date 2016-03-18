@@ -30,6 +30,7 @@
 		}
 		JUMP;
 	
+	// TODO negative values
 	op_pushxf: //ARG 1234
 		tmp = (int)(ip[2]);
 		while (tmp>fpb) tmp /= 10;
@@ -50,19 +51,7 @@
 	op_back: //ARG 12
 		ip -= (token)ip[1];
 		JUMP;
-		
-	op_callx: //ARG 1234
-		UTMP_LOAD_4();
-		rp[-1] = ip+2; // TODO vs token size
-		rp -= 1;
-		ip = ibase+utmp;
-		JUMP;
-		
-	op_tailcallx: //ARG 1234
-		UTMP_LOAD_4();
-		ip = ibase+utmp;
-		JUMP;
-		
+				
 	op_times: //ARG 12
 		if (rp[0]==0) {
 			rp += 1;
@@ -114,29 +103,44 @@
 		sp += 1;
 		ip += 2;
 		JUMP;
+
+// === RET / CALL =====================
+		
+	op_callx: //ARG 1234
+		UTMP_LOAD_4();
+		rp[-1] = (token*)bp;
+		rp[-2] = ip+2; // TODO vs token size
+		rp -= 2;
+		bp = rbase-rp;
+		ip = ibase+utmp;
+		JUMP;
+		
+	op_tailcallx: //ARG 1234
+		UTMP_LOAD_4();
+		ip = ibase+utmp;
+		JUMP;
 		
 	op_call:
-		rp[-1] = ip+1;
+		rp[-1] = (token*)bp;
+		rp[-2] = ip+1;
 		ip = (token*)(sp[0]+ibase);
-		rp -= 1;
+		rp -= 2;
+		bp = rbase-rp;
 		sp -= 1;
 		JUMP;
 		
 	op_ret:
-		ip=rp[0];
-		rp+=1;
+		ip=rbase[-bp];
+		bp=(int)rbase[bp+1];
+		rp+=2;
 		JUMP;
-		
-	op_retv: // TEST 
-		rp += 1+(uint)rp[0];
-		ip=rp[0]; rp+=1;
-		JUMP;
-	
+			
 	op_yield:
 		sp[1] = (int)(ip-ibase+1);
-		ip=rp[0];
-		rp+=1;
 		sp+=1;
+		ip=rbase[-bp];
+		bp=(int)rbase[-bp+1];
+		rp+=2;
 		JUMP;
 		
 // === PARAMETERS =====================

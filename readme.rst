@@ -6,8 +6,7 @@ FABRIS PROGRAMMING LANGUAGE
 Introduction
 ============
 
-Fabris is a `stack-oriented`_, `concatenative`_ language designed to be compact_,
-simple_ and efficient_.
+Fabris is a `stack-oriented`_, `concatenative`_ language designed to be simple_, friendly_ and efficient_.
 
 Fabris is inspired by Forth, Python, Joy, DSSP, Factor, COBOL and Unix.
 
@@ -17,7 +16,7 @@ Fabris is inspired by Forth, Python, Joy, DSSP, Factor, COBOL and Unix.
 Current Fabris version is unstable and is intended only for experimental use.
 
 The name comes from first leters of main components of Fabris VM:
-(F)ixed point base, (A)llocator stack, (B)uffer stack, (R)eturn stack, (I)nstruction pointer, (S)tack.
+(F)ixed point base, (A)uxiliary pointers, (B)ase pointer, (R)eturn stack, (I)nstruction pointer, (S)tack.
 
 Similarity with the name of Italian fencing master Salvator Fabris
 is not a coincidence.
@@ -75,10 +74,10 @@ New function definition::
 
 New function definition with named parameters::
 
-	def energy in h m v out 1 (e)
-		m v v mul mul 2 div -- kinetic energy
-		h m g mul mul -- potential energy
-		add (e) ret
+    def energy in h m v out 1 (e)
+        m v v mul mul 2 div -- kinetic energy
+        h m g mul mul -- potential energy
+        add (e) ret
 
 Testing::
 
@@ -113,6 +112,14 @@ Top-down programming::
     
     c dot -- prints 42
 
+Fixed point arithmetics::
+
+    1000 tof
+    3.14159    2  mul fdot -- prints 6.282
+    3.14159  2.0 fmul fdot -- prints 6.282
+       3141    2  mul fdot -- prints 6.282
+       3141 2000 fmul fdot -- prints 6.282
+
 
 Functions
 =========
@@ -139,59 +146,10 @@ Stack Manipulation
   dup      (a--aa)     duplicate the top stack item                                 yes 
   drop     (a--)       discard the top item                                         yes 
   depth    (--n)       push number of items on stack                                yes
-  tof      (a--)       move the top item to the fixed point base                    yes
-  toa      (a--)(=a)   move the top item to the allocator stack                     yes 
-  tob      (a--)(=a)   move the top item to the buffer stack                        yes 
   tor      (a--)(=a)   move the top item to the return stack                        yes 
-  f        (--x)       push fixed point base to stack                               yes
-  a        (--x)(a=)   move the top item of allocator stack to stack                yes
-  b        (--x)(a=)   move the top item of buffer stack to stack                   yes
   r        (--x)(a=)   move the top item of return stack to stack                   yes
+  tof      (a--)       move the top item to the fixed point base                    yes
   ======== =========== ============================================================ =====
-
-
-  ======== =========== ============================================================ =====
-  name     effect      comments                                                     core 
-  ======== =========== ============================================================ =====
-  over     (ab--aba)   push the second item on top                                      
-  nip      (ab--b)     discard the second item                                          
-  tuck     (ab--bab)   insert copy of top item before second item                       
-  rot      (abc--bca)  rotate the third item to the top                                 
-  unrot    (abc--cab)  unrotate the top to the third item                               
-  yank     (--a)(ab=b) remove second item from return stack and place it on stack       
-  mark     (--)(=n)    mark stack location (push stack depth to return stack)           
-  count    (--x)(n=)   push number of items after the mark, unmark stack                
-  cut      (?--)(n=)   drop items after marked stack location                           
-  mark-a   (--)(=n)      mark a-stack location (push stack depth to return stack)       
-  mark-b   (--)(=n)      mark a-stack location (push stack depth to return stack)        
-  cut-a    (--)(n=)      drop items after marked a-stack location                        
-  cut-b    (--)(n=)      drop items after marked b-stack location                        
-  chars    (n--x)        calculate number of items for storing n characters
-  bytes    (n--x)        calculate number of items for storing n bytes
-  alloc    (n--r)        allocate n items on allocator stack and push reference
-  buffer   (n--r)        allocate n items on buffer stack and push reference
-  ndrop    (?n--)      discard n top items (not counting n)                         
-  ======== =========== ============================================================ =====
-
-
-  ========= ============ ===========================================================
-  name      effect       comments
-  ========= ============ ===========================================================
-  dup2      (ab--abab)   duplicate top pair
-  swap2     (abxy--xyab) swap two pairs
-  drop2     (ab--)       drop pair
-  pick      (n--x)       pick nth stack item from top (not counting n)
-  reverse   (?n--?n)     reverse order of n top stack items
-  reverse2  (?n--?n)       reverse order of n top stack pairs
-  push-a    (?n--)       push n items from stack to a-stack
-  revpush-a (?n--)         push n items from stack to a-stack in reverse order
-  pop-a     (n--?)       pop n items from a-stack onto stack
-  revpop-a  (n--?)         pop n items from a-stack onto stack in reverse order
-  push-b    (?n--)       push n items from stack to b-stack
-  revpush-b (?n--)         push n items from stack to b-stack in reverse order
-  pop-b     (n--?)       pop n items from b-stack onto stack
-  revpop-b  (n--?)         pop n items from b-stack onto stack in reverse order
-  ========= ============ ===========================================================
 
 
 Basic Arithmetic
@@ -209,8 +167,8 @@ Basic Arithmetic
   dec      (a--x)    decrement the top item (a-1)
   abs      (a--x)    return absolute value (abs(a)) 
   neg      (a--x)    change the sign (-a)                                               yes
-  fmul     (ab--x)   fixed point - multiply two top items (a*b)                         yes  
-  fdiv     (ab--x)   fixed point - divide of second item by top item (a/b)              yes  
+  fmul     (ab--x)   fixed point - multiply two top items (a*b)                         opt.  
+  fdiv     (ab--x)   fixed point - divide of second item by top item (a/b)              opt.  
   ======== ========= ================================================================== =====
 
 
@@ -241,10 +199,6 @@ Logic
   and   (ab--x)  and two top items (a&b)                        yes
   or    (ab--x)  or two top items (a|b)                         yes
   xor   (ab--x)  xor two top items (a^b)                        yes
-  shl   (ab--x)  shift a left by b bits (a<<b)
-  shr   (ab--x)  shift a right by b bits (a>>b)
-  ushr  (ab--x)  shift unsigned a right by b bits (a>>b)
-  inv   (a--x)   invert all bits (~a)
   not   (a--x)   logical negation (!a)                          yes
   ===== ======== ============================================== =====
 
@@ -262,6 +216,7 @@ Input/Output
   argc    (--x)    returns number of program arguments                              opt.
   argv    (a--xn)  returns address and length of argument number a                  opt.
   dot     (a--a)   prints top item as number followed by space
+  fdot    (a--a)   prints top item as fixed point number followed by space          
   udot    (a--a)   prints top item as unsigned number followed by space
   xdot    (a--a)   prints top item as hexadecimal number followed by a space
   write   (anf--)    write n characters at address a to file with descriptor f
@@ -275,8 +230,8 @@ Control/Flow
   ======= ========= ================================================================ =====
   def X   (--)      define new word X                                                yes
   ret     (--)      return from definition                                           yes
-  macro X (--)      define new macro X                                               yes
-  mend    (--)      end macro definition                                             yes
+  macro X (--)      define new macro X                                               opt.
+  mend    (--)      end macro definition                                             opt.
   then    (x--)     execute following code if x is not zero                          yes
   else    (--)      branch for the then word (optional)                              yes
   end     (--)      finish then/else sequence                                        yes
@@ -296,9 +251,10 @@ Control/Flow
   dyn X   (--)      declare word X as dynamic, that can change at the runtime        yes
   ref X   (--r)     put reference to word X on the stack                             yes
   as X    (r--)     redefine dynamic word X as code reference r                      yes
-  in X... (--)      define names of input parameters                                 yes
+  in X... (--)      define names of input parameters, set input register             yes
   out X   (--)      define number of output parameters                               yes
   ======= ========= ================================================================ =====
+
 
 Other
 -----
@@ -315,6 +271,47 @@ Other
   trace   (--)     prints information about VM state - stack, ip, ...
   sprint  (--)     prints stack
   ======= ======== ================================================================ =====
+
+
+More Logic
+----------
+
+  ===== ======== ============================================== =====
+  name  effect   comments                                       core
+  ===== ======== ============================================== =====
+  shl   (ab--x)  shift a left by b bits (a<<b)
+  shr   (ab--x)  shift a right by b bits (a>>b)
+  ushr  (ab--x)  shift unsigned a right by b bits (a>>b)
+  inv   (a--x)   invert all bits (~a)
+  ===== ======== ============================================== =====
+
+
+More Stack Manipulation
+-----------------------
+
+  ========= ============ ============================================================ =====
+  name      effect       comments                                                     core 
+  ========= ============ ============================================================ =====
+  over      (ab--aba)    push the second item on top                                      
+  nip       (ab--b)      discard the second item                                          
+  tuck      (ab--bab)    insert copy of top item before second item                       
+  rot       (abc--bca)   rotate the third item to the top                                 
+  unrot     (abc--cab)   unrotate the top to the third item                               
+  yank      (--a)(ab=b)  remove second item from return stack and place it on stack       
+  mark      (--)(=n)     mark stack location (push stack depth to return stack)           
+  count     (--x)(n=)    push number of items after the mark, unmark stack                
+  cut       (?--)(n=)    drop items after marked stack location                           
+  chars     (n--x)         calculate number of items for storing n characters
+  bytes     (n--x)         calculate number of items for storing n bytes
+  ndrop     (?n--)       discard n top items (not counting n)                         
+  dup2      (ab--abab)   duplicate top pair
+  swap2     (abxy--xyab) swap two pairs
+  drop2     (ab--)       drop pair
+  pick      (n--x)       pick nth stack item from top (not counting n)
+  reverse   (?n--?n)     reverse order of n top stack items
+  reverse2  (?n--?n)       reverse order of n top stack pairs
+  ========= ============ ============================================================ =====
+
 
 String Manipulation
 -------------------
@@ -404,9 +401,9 @@ Related articles:
 .. [4] https://en.wikipedia.org/wiki/Threaded_code
 
 
-.. _compact:
+.. _simple:
 
-Minimalism
+Simplicity
 ==========
 
 ..	OLD:
@@ -422,8 +419,9 @@ Minimalism
 	- 3 other words: emit, char, halt
 	- 4 optional words: clock, take, argc, argv
 
-.. _simple:
 
-Simplicity
-==========
+.. _friendly:
+
+Friendly Language
+=================
 

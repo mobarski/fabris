@@ -24,8 +24,8 @@ token **rp;	// return stack pointer - grows down
 #endif
 
 int fpb;		// fixed point base
-int *ap;		// allocator stack pointer - grows up
-int *bp;		// buffer stack pointer - grows down
+int *ap;		// aux pointer
+int bp;		// base pointer
 int ir;		// index register
 
 int *abase;	// allocator stack base
@@ -84,15 +84,11 @@ void run_goto() {
 
 // ==================================================
 
-void init(int *stack, int cells, int *stack2, int cells2, token *code) {
+void init(int *stack, int cells, token *code) {
 	ip=code;
 	sp=stack;
 	rp=(token**)(stack+cells);
-	ap=stack2;
-	bp=stack2+cells2;
-	
-	abase=ap;
-	bbase=bp;
+
 	rbase=rp;
 	ibase=ip;
 	sbase=sp;
@@ -103,9 +99,8 @@ void runcode() {
 	token code[] = {
 		#include "gen/code.h"
 	};
-	int mem[1024];
-	int mem2[4*1024];
-	init(&mem[0],1024,&mem2[0],4*1024,code);
+	int mem[1024*1024];
+	init(&mem[0],1024*1024,code);
 	
 	run_goto();
 	//run_switch();
